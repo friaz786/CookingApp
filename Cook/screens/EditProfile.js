@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert,View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { getAuth, updateEmail, updatePassword,sendEmailVerification } from 'firebase/auth';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
-import UserModel from './UserModel';
+import UserModel from '../models/UserModel';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const EditProfile = ({navigation}) => {

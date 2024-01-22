@@ -1,14 +1,14 @@
 //import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import Login from './Login';
-import Signup from './Signup';
+import Login from './screens/Login';
+import Signup from './screens/Signup';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Home from './Home';
-import ForgotPassword from './ForgotPassword';
-import Profile from './Profile';
-import Scanner from './Scanner';
-import EditProfile from './EditProfile';
+import Home from './screens/Home';
+import ForgotPassword from './screens/ForgotPassword';
+import Profile from './screens/Profile';
+import Scanner from './screens/Scanner';
+import EditProfile from './screens/EditProfile';
 //import RecipeDetail from './RecipeDetail';
 
 

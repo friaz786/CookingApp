@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import rec from './assets/appLogo.jpg';
+import rec from '../assets/appLogo.jpg';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 

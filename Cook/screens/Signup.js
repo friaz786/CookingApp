@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'; // Importing necessary functions
 import { doc, setDoc } from 'firebase/firestore';
-import { db } from './firebase'; // Import db from your firebase.js
-import UserModel from './UserModel';
+import { db } from '../firebase'; // Import db from your firebase.js
+import {UserModel} from '../models/UserModel';
 // import {app} from './firebase';
 
 const Signup = ({ navigation }) => {

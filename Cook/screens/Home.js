@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from './firebase';
+import { db } from '../firebase';
 
 const Home = ({navigation}) => {
     const [searchQuery, setSearchQuery] = useState('');
