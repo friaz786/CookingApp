@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert,View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Alert,View, TextInput, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { getAuth, updateEmail, updatePassword,sendEmailVerification } from 'firebase/auth';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 import UserModel from '../models/UserModel';
@@ -63,6 +63,7 @@ const EditProfile = ({navigation}) => {
   };
 
     return (
+      <SafeAreaView>
         <View style={styles.container}>
           <Text style={styles.header}>Edit Profile</Text>
             {/* Email Input and Button */}
@@ -87,7 +88,8 @@ const EditProfile = ({navigation}) => {
             <TouchableOpacity style={styles.button} onPress={handleUpdateName}>
                 <Text>Update Name</Text>
             </TouchableOpacity>
-        </View>
+          </View>
+        </SafeAreaView>
     );
 };
 

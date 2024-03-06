@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, TextInput, Text, TouchableOpacity, Image, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import rec from '../assets/appLogo.jpg';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
@@ -19,7 +19,7 @@ const Login = ({ navigation }) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('Login Successful');
-      navigation.navigate('home')
+      navigation.navigate('navigation')
 
     } catch (error) {
       alert(error.message);
@@ -27,19 +27,21 @@ const Login = ({ navigation }) => {
   }
 
   return (
+    <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={true}>
     <View style={styles.container}>
       {/* Header */}
       <Image source={rec} style={styles.logo} />
 
       {/* Email Input Field */}
-      <View style={styles.inputContainer}>
+      
         <TextInput
+          style={styles.inputContainer}
           onChangeText={setEmail}
           value={email}
           placeholder="Email"
           keyboardType="email-address"
         />
-      </View>
 
       {/* Password Input Field */}
 
@@ -58,8 +60,6 @@ const Login = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-
-
       {/* Login Button */}
       <TouchableOpacity style={styles.button} onPress={() => handleLogin()}>
         <Text style={styles.buttonText}>Login</Text>
@@ -74,6 +74,8 @@ const Login = ({ navigation }) => {
       {/* Feedback Mechanism */}
       {/* Display error or confirmation messages here */}
     </View>
+    </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 

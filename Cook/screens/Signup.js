@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView } from 'react-native';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'; // Importing necessary functions
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase'; // Import db from your firebase.js
-import {UserModel} from '../models/UserModel';
+import UserModel from '../models/UserModel';
 // import {app} from './firebase';
 
 const Signup = ({ navigation }) => {
@@ -11,6 +11,7 @@ const Signup = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [isChef, setIsChef] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const auth = getAuth();
 
@@ -23,8 +24,13 @@ const Signup = ({ navigation }) => {
             const user = userCredential.user;
         
             console.log('Preparing user data for Firestore');
-            const newUser = new UserModel(name,phoneNumber);
-        
+            let newUser;
+            if (isChef) {
+                newUser = new UserModel(name, phoneNumber, 'chef');
+            }
+            else {
+                newUser = new UserModel(name, phoneNumber, 'normal-user')
+            }
             console.log('Attempting to store user data in Firestore');
             await setDoc(doc(db, "users", user.uid), newUser.toFirestore());
             Alert.alert('User registered successfully');
@@ -38,10 +44,11 @@ const Signup = ({ navigation }) => {
     };
 
     return (
+    <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={true}>
         <View style={styles.container}>
             {/* Header */}
             <Text style={styles.header}>Create New Account</Text>
-
             {/* Name Input */}
             <TextInput
                 style={styles.input}
@@ -76,6 +83,17 @@ const Signup = ({ navigation }) => {
                 placeholder="Password"
                 secureTextEntry={true}
             />
+            <View style={styles.checkboxContainer}>
+                <TouchableOpacity
+                    style={styles.checkbox}
+                    onPress={() => setIsChef(!isChef)}
+                >
+                <View style={isChef ? styles.checkboxChecked : {}} />
+                </TouchableOpacity>
+                <Text style={styles.checkboxLabel} onPress={() => setIsChef(!isChef)}>
+                    Do you want to register as a chef?
+                </Text>
+            </View>
 
             {/* Signup Button */}
             <TouchableOpacity style={styles.button} onPress={handleSignup}>
@@ -86,6 +104,8 @@ const Signup = ({ navigation }) => {
                 Already Registered? Login here
             </Text>
         </View>
+        </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -118,6 +138,29 @@ const Signup = ({ navigation }) => {
             borderRadius: 8,
             marginBottom: 15,
         },
+        checkboxContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 15,
+          },
+          checkbox: {
+            width: 24,
+            height: 24,
+            marginRight: 8,
+            borderWidth: 1,
+            borderColor: '#ddd',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+          checkboxChecked: {
+            width: 12,
+            height: 12,
+            backgroundColor: '#5cb85c',
+          },
+          checkboxLabel: {
+            flex: 1,
+            marginLeft: 8,
+          },
         button: {
             width: '100%',
             padding: 15,
