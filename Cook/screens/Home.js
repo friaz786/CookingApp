@@ -3,6 +3,7 @@ import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, ScrollVi
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Home = ({navigation}) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -31,7 +32,7 @@ const Home = ({navigation}) => {
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.header}>Recipe Search</Text>
           
             <TextInput
@@ -65,20 +66,7 @@ const Home = ({navigation}) => {
                     ))}
                 </ScrollView>
             )}
-
-            <View style={styles.bottomBar}>
-                <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('home')}>
-                    <Ionicons name="home-outline" size={30} color="#4F8EF7" />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('scanner')}>
-                    <Ionicons name="scan-outline" size={30} color="#4F8EF7" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('profile')}>
-                    <Ionicons name="person-outline" size={30} color="#4F8EF7" />
-                </TouchableOpacity>
-            </View>
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -117,10 +105,12 @@ const styles = StyleSheet.create({
     recipeDetailTitle: {
         fontSize: 24,
         fontWeight: 'bold',
+        color: '#5cb85c',
     },
     recipeDetailHeader: {
         fontSize: 20,
         marginTop: 10,
+        //color: '#5cb85c',
     },
     recipeDetailText: {
         fontSize: 16,

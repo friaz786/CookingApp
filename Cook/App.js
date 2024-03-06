@@ -1,4 +1,5 @@
 //import { StatusBar } from 'expo-status-bar';
+import "react-native-gesture-handler";
 import { StyleSheet, Text, View } from 'react-native';
 import Login from './screens/Login';
 import Signup from './screens/Signup';
@@ -8,20 +9,21 @@ import Home from './screens/Home';
 import ForgotPassword from './screens/ForgotPassword';
 import Profile from './screens/Profile';
 import Scanner from './screens/Scanner';
-import EditProfile from './screens/EditProfile';
+import MealPlanner from './screens/MealPlanner';
+import CalendarScreen from './screens/CalendarScreen';
+import CreateMealPlan from './screens/CreateMealPlan';
+import SearchRecipe from './screens/SearchRecipe';
+import DrawerNavigation from "./screens/DrawerNavigation";
+import HealthForm from "./screens/HealthForm";
 //import RecipeDetail from './RecipeDetail';
 
-
-
 const Stack = createNativeStackNavigator();
-
-
 
 export default function App() {
   return (
 
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="login">
         <Stack.Screen name="login" component={Login}
           options={
             {
@@ -38,7 +40,7 @@ export default function App() {
 
         />
 
-        <Stack.Screen name="home" component={Home}
+        <Stack.Screen name="navigation" component={DrawerNavigation}
           options={
             {
               headerShown: false
@@ -62,7 +64,8 @@ export default function App() {
           }
 
         />
-        <Stack.Screen name="editprofile" component={EditProfile}
+        
+        <Stack.Screen name="scanner" component={Scanner}
           options={
             {
               headerShown: false
@@ -70,7 +73,33 @@ export default function App() {
           }
 
         />
-        <Stack.Screen name="scanner" component={Scanner}
+       
+        <Stack.Screen name="calendar" component={CalendarScreen}
+          options={
+            {
+              headerShown: false
+            }
+          }
+
+        />
+
+        <Stack.Screen name="createmealplan" component={CreateMealPlan}
+          options={
+            {
+              headerShown: false
+            }
+          }
+
+        />
+        <Stack.Screen name="searchrecipe" component={SearchRecipe}
+          options={
+            {
+              headerShown: false
+            }
+          }
+
+        />
+        <Stack.Screen name="healthform" component={HealthForm}
           options={
             {
               headerShown: false
