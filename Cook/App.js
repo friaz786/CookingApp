@@ -15,6 +15,13 @@ import CreateMealPlan from './screens/CreateMealPlan';
 import SearchRecipe from './screens/SearchRecipe';
 import DrawerNavigation from "./screens/DrawerNavigation";
 import HealthForm from "./screens/HealthForm";
+import EditProfile from "./screens/EditProfile";
+import Add from "./screens/Add";
+import Save from "./screens/Save";
+import Fetch from "./screens/Fetch";
+import OtherUserProfile from "./screens/OtherUserProfile";
+import PostDetail from "./screens/PostDetail";
+import EditPost from "./screens/EditPost";
 //import RecipeDetail from './RecipeDetail';
 
 const Stack = createNativeStackNavigator();
@@ -64,7 +71,15 @@ export default function App() {
           }
 
         />
-        
+        <Stack.Screen name="editprofile" component={EditProfile}
+          options={
+            {
+              headerShown: false
+            }
+          }
+
+        />
+
         <Stack.Screen name="scanner" component={Scanner}
           options={
             {
@@ -73,7 +88,7 @@ export default function App() {
           }
 
         />
-       
+
         <Stack.Screen name="calendar" component={CalendarScreen}
           options={
             {
@@ -106,7 +121,52 @@ export default function App() {
             }
           }
 
+
         />
+        <Stack.Screen name="add" component={Add}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="save" component={Save}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="fetch" component={Fetch}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="otheruserprofile" component={OtherUserProfile}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="postdetail" component={PostDetail}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="editpost" component={EditPost}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+
+
       </Stack.Navigator>
 
     </NavigationContainer>

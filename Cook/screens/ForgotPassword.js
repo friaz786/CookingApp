@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Make sure to install this package
+import Icon from 'react-native-vector-icons/Ionicons';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
 
 const ForgotPassword = ({ navigation }) => {
@@ -17,7 +17,6 @@ const ForgotPassword = ({ navigation }) => {
       })
       .catch((error) => {
         const errorMessage = error.message;
-        // Handle errors here
         Alert.alert("Error", errorMessage);
       });
   };
