@@ -1,25 +1,28 @@
 import React from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 
 export default function CreateMealPlan({ navigation, route }) {
     const { date } = route.params;
 
-    // Define functions to handle the press on each plus button if needed
-    const onSelect = () => {
-        navigation.navigate('searchrecipe');
-        // Add your logic to handle adding breakfast
+    const onSelect = (mealType) => {
+        navigation.navigate('searchrecipe', { mealType, date });
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
+                {/* Back Button */}
+                <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
+                    <Icon name="arrow-back" size={30} color="#000" />
+                </TouchableOpacity>
                 <Text style={styles.headerTitle}>Meal Plan</Text>
                 <Text style={styles.dateText}>{date}</Text>
             </View>
 
             {/* Breakfast Section */}
             <View style={styles.mealSection}>
-                <TouchableOpacity style={styles.addButton} onPress={onSelect}>
+                <TouchableOpacity style={styles.addButton} onPress={() => onSelect('Breakfast')}>
                     <Text style={styles.plusText}>+</Text>
                 </TouchableOpacity>
                 <Text style={styles.mealHeaderText}>Breakfast</Text>
@@ -27,7 +30,7 @@ export default function CreateMealPlan({ navigation, route }) {
 
             {/* Lunch Section */}
             <View style={styles.mealSection}>
-                <TouchableOpacity style={styles.addButton} onPress={onSelect}>
+                <TouchableOpacity style={styles.addButton} onPress={() => onSelect('Lunch')}>
                     <Text style={styles.plusText}>+</Text>
                 </TouchableOpacity>
                 <Text style={styles.mealHeaderText}>Lunch</Text>
@@ -35,7 +38,7 @@ export default function CreateMealPlan({ navigation, route }) {
 
             {/* Dinner Section */}
             <View style={styles.mealSection}>
-                <TouchableOpacity style={styles.addButton} onPress={onSelect}>
+                <TouchableOpacity style={styles.addButton} onPress={() => onSelect('Dinner')}>
                     <Text style={styles.plusText}>+</Text>
                 </TouchableOpacity>
                 <Text style={styles.mealHeaderText}>Dinner</Text>
@@ -50,24 +53,69 @@ export default function CreateMealPlan({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-    // ... other styles remain unchanged
-
+    container: {
+        flex: 1,
+        backgroundColor: '#f8f9fa',
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#ffffff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#dee2e6',
+        //justifyContent: "center",
+    },
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333333',
+        
+    },
+    dateText: {
+        fontSize: 18,
+        color: '#6c757d',
+        marginTop: 4,
+    },
+    backButton: {
+        marginRight: 10,
+        backgroundColor: '#6c757d', // Optional: Choose a suitable color
+        padding: 10,
+        borderRadius: 5,
+    },
     mealSection: {
-        flexDirection: 'row', // Aligns button and text horizontally
-        alignItems: 'center', // Centers items vertically in the row
-        padding: 20, // Add padding for spacing
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 20,
     },
     addButton: {
-        marginRight: 10, // Add some margin to the right of the plus button
+        marginRight: 10,
+        backgroundColor: '#007bff',
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     plusText: {
-        fontSize: 24, // Set font size for the plus sign
-        color: 'blue', // Set a color for the plus sign
+        fontSize: 24,
+        color: '#ffffff',
     },
     mealHeaderText: {
-        fontSize: 20, // Set font size for meal headers
-        fontWeight: 'bold', // Make the meal headers bold
-        color: '#2c3e50', // A dark color for the meal header text
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#2c3e50',
     },
-    // ... add any additional styles you might need
+    button: {
+        backgroundColor: '#28a745',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        margin: 20,
+    },
+    buttonText: {
+        color: '#ffffff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
 });

@@ -12,8 +12,16 @@ const Signup = ({ navigation }) => {
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isChef, setIsChef] = useState(false);
+    const [selectedCuisines, setSelectedCuisines] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const auth = getAuth();
+    const cuisines = [
+        { id: 1, name: 'Italian' },
+        { id: 2, name: 'French' },
+        { id: 3, name: 'Japanese' },
+        { id: 4, name: 'Chinese' },
+        { id: 5, name: 'Indian' },
+    ];
 
     const handleSignup = async () => {
         try {
@@ -42,6 +50,20 @@ const Signup = ({ navigation }) => {
         }
         
     };
+    
+
+
+    const toggleCuisine = (cuisineName) => {
+        setSelectedCuisines((currentCuisines) => {
+            const newState = currentCuisines.includes(cuisineName) 
+                ? currentCuisines.filter((c) => c !== cuisineName) 
+                : [...currentCuisines, cuisineName];
+            console.log(`Toggling ${cuisineName}`, newState);
+            return newState;
+        });
+    };
+    
+
 
     return (
     <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
@@ -95,6 +117,20 @@ const Signup = ({ navigation }) => {
                 </Text>
             </View>
 
+            <View>
+    <Text>Select your Preferred Cuisine:</Text>
+    {cuisines.map((cuisine) => (
+        <TouchableOpacity
+            key={cuisine.id}
+            style={styles.checkboxContainer}
+            onPress={() => toggleCuisine(cuisine.name)} // Toggling based on cuisine name
+        >
+            <View style={[styles.checkbox, selectedCuisines.includes(cuisine.name) ? styles.checkboxChecked : {}]} />
+            <Text style={styles.checkboxLabel}>{cuisine.name}</Text>
+        </TouchableOpacity>
+    ))}
+</View>
+
             {/* Signup Button */}
             <TouchableOpacity style={styles.button} onPress={handleSignup}>
                 <Text style={styles.buttonText}>Sign Up</Text>
@@ -142,25 +178,28 @@ const Signup = ({ navigation }) => {
             flexDirection: 'row',
             alignItems: 'center',
             marginBottom: 15,
-          },
-          checkbox: {
+            width: '80%', // Set a width to contain the checkboxes nicely
+        },
+        checkbox: {
             width: 24,
             height: 24,
             marginRight: 8,
-            borderWidth: 1,
+            borderWidth: 2, // Make the border thicker for better visibility
             borderColor: '#ddd',
             alignItems: 'center',
             justifyContent: 'center',
-          },
-          checkboxChecked: {
+        },
+        checkboxChecked: {
             width: 12,
             height: 12,
-            backgroundColor: '#5cb85c',
-          },
-          checkboxLabel: {
+            backgroundColor: '#007AFF', // Use a distinct color for better visibility when checked
+        },
+        checkboxLabel: {
             flex: 1,
             marginLeft: 8,
-          },
+            fontSize: 16, // Increase font size for better readability
+            color: '#333', // Use a darker color for better contrast and readability
+        },
         button: {
             width: '100%',
             padding: 15,
