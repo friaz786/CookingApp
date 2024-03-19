@@ -137,6 +137,23 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
+  picContainer:{
+    padding: 13,
+    paddingHorizontal: 40,
+    marginHorizontal: 40,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  containerVid: {
+    flex: 1,
+    resizeMode: "contain",
+    height: '75%',
+    alignItems: "center",
+    justifyContent: "center",
+
+  },
+
 });
 
 export default styles;

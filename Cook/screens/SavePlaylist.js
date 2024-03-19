@@ -27,7 +27,7 @@ export default function Save({ route, navigation }) {
 
   async function handleCreatePost(userID, image, caption) {
     try {
-      await addDoc(collection(db, 'posts'), {
+      await addDoc(collection(db, 'playlist'), {
         userID,
         image,
         caption,
@@ -35,7 +35,7 @@ export default function Save({ route, navigation }) {
         comments: [], // Default comments array
         createdAt: new Date(), // Add a timestamp if you need to sort or filter by creation date
       });
-      console.log('Post saved to Firebase');
+      console.log('playlist saved to Firebase');
     } catch (error) {
       console.error('Error saving post to Firebase:', error);
       throw new Error('Failed to save post to Firebase');
@@ -50,7 +50,7 @@ export default function Save({ route, navigation }) {
 
     try {
       await handleCreatePost(userID, image, caption);
-      Alert.alert('Success', 'Post saved successfully!');
+      Alert.alert('Success', 'Video added to playlist successfully!');
       navigation.navigate("Home");
       //navigation.popToTop(); // Navigate back to the top of the stack
     } catch (error) {

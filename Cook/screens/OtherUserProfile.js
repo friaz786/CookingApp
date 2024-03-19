@@ -1,42 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Button, FlatList, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { db } from '../firebase'; // Adjust this import according to your file structure
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { query, where, getDocs } from 'firebase/firestore';
+import { Video } from 'expo-av';
 
 const OtherUserProfile = ({ route, navigation }) => {
   const { userId } = route.params;
-  const [userProfile, setUserProfile] = useState({ name: '', followers: [], following: []});
-
-// Later in your component, when rendering:
-
-
-
+  const [userProfile, setUserProfile] = useState({ name: '', followers: [], following: [] });
   const [isFollowing, setIsFollowing] = useState(false);
   const auth = getAuth();
   const currentUser = auth.currentUser;
-
   const [userPosts, setUserPosts] = useState([]);
+  const [userIsChef, setUserIsChef] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  // Fetch the role of the user when the component is mounted or when userId changes
+  // useEffect(() => {
+  //   const fetchUserRole = async () => {
+  //     const userDocRef = doc(db, 'users', userId);
+  //     const docSnap = await getDoc(userDocRef);
+  //     if (docSnap.exists()) {
+  //       const userData = docSnap.data();
+  //       setUserIsChef(userData.role === 'chef'); // Set userIsChef based on the role
+  //       setCurrentUserSubscribed(userData.subscribers?.includes(currentUser.uid)); // Check if the current user is subscribed
+  //     }
+  //   };
+
+  //   fetchUserRole();
+  // }, [userId]);
+
   useEffect(() => {
     const fetchUserData = async () => {
 
-        //console.log('userId', userId);
-        // Assuming you have a 'posts' collection with a 'userID' field linking to the user's UID
-        const postsRef = query(collection(db, 'posts'), where('userID', '==', userId));
+      //console.log('userId', userId);
+      // Assuming you have a 'posts' collection with a 'userID' field linking to the user's UID
+      const postsRef = query(collection(db, 'posts'), where('userID', '==', userId));
 
-        const postsSnap = await getDocs(postsRef);
-        const fetchedPosts = [];
-        postsSnap.forEach((doc) => {
-          fetchedPosts.push({
-            id: doc.id,
-            ...doc.data(),
-          });
+      const postsSnap = await getDocs(postsRef);
+      const fetchedPosts = [];
+      postsSnap.forEach((doc) => {
+        fetchedPosts.push({
+          id: doc.id,
+          ...doc.data(),
         });
-        setUserPosts(fetchedPosts); // Set the user's posts
-      }
- 
+      });
+      setUserPosts(fetchedPosts); // Set the user's posts
+    }
+
 
     fetchUserData();
   }, []);
@@ -59,12 +72,12 @@ const OtherUserProfile = ({ route, navigation }) => {
 
   const handleFollow = async () => {
     if (!currentUser) return; // Guard clause in case currentUser is null
-    
+
     // Reference to the profile being viewed
     const viewedUserRef = doc(db, 'users', userId);
     // Reference to the current user's document
     const currentUserRef = doc(db, 'users', currentUser.uid);
-  
+
     try {
       if (isFollowing) {
         // If already following, remove userId from currentUser's following list and vice versa
@@ -100,11 +113,64 @@ const OtherUserProfile = ({ route, navigation }) => {
       // Optionally handle the error, e.g., through user feedback
     }
   };
+
+  useEffect(() => {
+    const fetchAdditionalUserData = async () => {
+      const docRef = doc(db, 'users', userId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setUserIsChef(data.role === 'chef'); // Assuming 'role' field holds the user role
+        setIsSubscribed(data.subscribers?.includes(currentUser.uid)); // Assuming 'subscribers' field holds an array of subscriber IDs
+      }
+    };
+
+    fetchAdditionalUserData();
+  }, [userId, currentUser.uid]);
+
+  // Function to handle subscribe/unsubscribe
+  const handleSubscription = async () => {
+    const profileRef = doc(db, 'users', userId);
+    const currentUserRef = doc(db, 'users', currentUser.uid);
+
+    if (isSubscribed) {
+      await updateDoc(profileRef, {
+        subscribers: arrayRemove(currentUser.uid)
+      });
+      await updateDoc(currentUserRef, {
+        subscribedTo: arrayRemove(userId)
+      });
+      setIsSubscribed(false);
+    } else {
+      await updateDoc(profileRef, {
+        subscribers: arrayUnion(currentUser.uid)
+      });
+      await updateDoc(currentUserRef, {
+        subscribedTo: arrayUnion(userId)
+      });
+      setIsSubscribed(true);
+    }
+  };
+
+  const handlePlaylistPress = () => {
+    if (isSubscribed) {
+      // User is subscribed, navigate to the Playlist screen with the userId parameter
+      navigation.navigate('otherplaylist', { userId: userId });
+    } else {
+      // User is not subscribed, show an alert
+      Alert.alert(
+        "Subscribe Required",
+        "Please subscribe to access the playlist.",
+        [{ text: "OK" }]
+      );
+    }
+  };
   
+
 
   return (
     <View contentContainerStyle={styles.container}>
-              {/* Back Icon */}
+      {/* Back Icon */}
       <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
         <Icon name="arrow-back" size={30} color="#000" />
       </TouchableOpacity>
@@ -112,6 +178,18 @@ const OtherUserProfile = ({ route, navigation }) => {
       <Button title={isFollowing ? 'Unfollow' : 'Follow'} onPress={handleFollow} />
       <Text style={styles.followers}>Followers: {userProfile.followers.length}</Text>
       <Text style={styles.followers}>Following: {userProfile.following.length}</Text>
+      {userIsChef && (
+        <View>
+          <Button
+            title={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+            onPress={handleSubscription}
+          />
+          <Button
+            title="Playlist"
+            onPress={handlePlaylistPress}
+          />
+        </View>
+      )}
       {/* <Text style={styles.followers}>Followers: {userProfile.followers?.length || 0}</Text> */}
       {/* <FlatList
         data={userProfile.posts}
@@ -123,21 +201,39 @@ const OtherUserProfile = ({ route, navigation }) => {
         ListHeaderComponent={<Text style={styles.postsHeader}>Posts</Text>}
       /> */}
       <View style={styles.container}>
-      {userPosts.length > 0 ? (
-        <FlatList
-          data={userPosts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => navigation.navigate('postdetail', { post: item })}>
-            <Image source={{ uri: item.image }} style={styles.image} />
-          </TouchableOpacity>
-          )}
-          numColumns={3} // Display images in a grid format
-        />
-      ) : (
-        <Text>No posts found</Text>
-      )}
-    </View>
+        {userPosts.length > 0 ? (
+          <FlatList
+            data={userPosts}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => navigation.navigate('postdetail', { post: item })}>
+                {/* <Image source={{ uri: item.image }} style={styles.image} /> */}
+                {
+                  item.image && (item.image.endsWith('.mp4') || item.image.endsWith('.mov')) ? (
+                    <Video
+                      source={{ uri: item.image }}
+                      style={styles.image}
+                      useNativeControls
+                      resizeMode="contain"
+                    // shouldPlay // Auto-play the video
+                    // isLooping // Loop the video
+                    // onError={(e) => console.error("Error loading video", e)}
+
+                    // onLoadStart={() => setIsLoading(true)}
+                    // onLoad={() => setIsLoading(false)}
+                    />
+                  ) : (
+                    <Image source={{ uri: item.image }} style={styles.image} />
+                  )
+                }
+              </TouchableOpacity>
+            )}
+            numColumns={3} // Display images in a grid format
+          />
+        ) : (
+          <Text>No posts found</Text>
+        )}
+      </View>
 
     </View>
   );

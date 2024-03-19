@@ -22,11 +22,21 @@ import Fetch from "./screens/Fetch";
 import OtherUserProfile from "./screens/OtherUserProfile";
 import PostDetail from "./screens/PostDetail";
 import EditPost from "./screens/EditPost";
+import Playlist from "./screens/Playlist";
+import Reels from "./screens/Reels";
+import SavePlaylist from "./screens/SavePlaylist";
+import OtherPlaylist from "./screens/OtherPlaylist";
+import PlaylistDetail from "./screens/PlaylistDetail";
+import EditVideo from "./screens/EditVideo";
+import Meeting from "./screens/Meeting";
+import MeetingDetail from "./screens/MeetingDetail";
+import registerNNPushToken from 'native-notify';
 //import RecipeDetail from './RecipeDetail';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  registerNNPushToken(20279, 's8Q9XyDowsItMqDizvD4NN');
   return (
 
     <NavigationContainer>
@@ -165,6 +175,63 @@ export default function App() {
             }
           }
         />
+        <Stack.Screen name="playlist" component={Playlist}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="reels" component={Reels}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="saveplaylist" component={SavePlaylist}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="otherplaylist" component={OtherPlaylist}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="playlistdetail" component={PlaylistDetail}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="editvideo" component={EditVideo}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+        <Stack.Screen name="meeting" component={Meeting}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+                <Stack.Screen name="meetingdetail" component={MeetingDetail}
+          options={
+            {
+              headerShown: false
+            }
+          }
+        />
+
 
 
       </Stack.Navigator>

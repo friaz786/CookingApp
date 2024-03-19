@@ -8,25 +8,25 @@ import { Video } from 'expo-av';
 
 
 
-const PostDetail = ({ route, navigation }) => {
-    const { post } = route.params;
-    const [likes, setLikes] = useState(post.likes || []);
+const PlaylistDetail = ({ route, navigation }) => {
+    const { videoData } = route.params;
+    const [likes, setLikes] = useState(videoData.likes || []);
     const [comment, setComment] = useState('');
-    const [comments, setComments] = useState(post.comments || []);
+    const [comments, setComments] = useState(videoData.comments || []);
     const auth = getAuth();
     const [isLoading, setIsLoading] = useState(true);
     const currentUser = auth.currentUser;
 
     const handleLike = async () => {
-        const postRef = doc(db, 'posts', post.id);
+        const videoDataRef = doc(db, 'playlist', videoData.id);
         // Toggle like
         if (!likes.includes(currentUser.uid)) {
-            await updateDoc(postRef, {
+            await updateDoc(videoDataRef, {
                 likes: arrayUnion(currentUser.uid),
             });
             setLikes([...likes, currentUser.uid]);
         } else {
-            await updateDoc(postRef, {
+            await updateDoc(videoDataRef, {
                 likes: likes.filter(uid => uid !== currentUser.uid),
             });
             setLikes(likes.filter(uid => uid !== currentUser.uid));
@@ -39,9 +39,9 @@ const PostDetail = ({ route, navigation }) => {
             userId: currentUser.uid,
             text: comment,
         };
-        const postRef = doc(db, 'posts', post.id);
+        const videoDataRef = doc(db, 'playlist', videoData.id);
         try {
-            await updateDoc(postRef, {
+            await updateDoc(videoDataRef, {
                 comments: arrayUnion(newComment),
             });
             setComments([...comments, { ...newComment, timestamp: new Date() }]); // Optimistically update local state
@@ -54,13 +54,13 @@ const PostDetail = ({ route, navigation }) => {
 
     useEffect(() => {
         const fetchComments = async () => {
-            const postRef = doc(db, 'posts', post.id);
-            const docSnap = await getDoc(postRef);
+            const videoDataRef = doc(db, 'playlist', videoData.id);
+            const docSnap = await getDoc(videoDataRef);
 
             if (docSnap.exists()) {
-                const postData = docSnap.data();
-                if (postData.comments) {
-                    setComments(postData.comments); // Assuming 'comments' is an array field in your post document
+                const videoDataData = docSnap.data();
+                if (videoDataData.comments) {
+                    setComments(videoDataData.comments); // Assuming 'comments' is an array field in your videoData document
                 }
             } else {
                 console.log("No such document!");
@@ -68,19 +68,19 @@ const PostDetail = ({ route, navigation }) => {
         };
 
         fetchComments();
-    }, [post.id]); // Dependency on post.id to refetch if the post changes
+    }, [videoData.id]); // Dependency on videoData.id to refetch if the videoData changes
 
 
     useEffect(() => {
-        console.log("Post User ID:", post.userID);
+        console.log("videoData User ID:", videoData.userID);
         console.log("Current User ID:", currentUser?.uid);
-    }, [post, currentUser]);
+    }, [videoData, currentUser]);
 
     useEffect(() => {
-        console.log(post); // Check the structure of 'post' to ensure it includes 'userId'
-    }, [post]);
+        console.log(videoData); // Check the structure of 'videoData' to ensure it includes 'userId'
+    }, [videoData]);
 
-    const isCurrentUserThePoster = currentUser?.uid === post.userID;
+    const isCurrentUserThePoster = currentUser?.uid === videoData.userID;
 
     return (
 
@@ -92,17 +92,17 @@ const PostDetail = ({ route, navigation }) => {
             </TouchableOpacity>
             {isCurrentUserThePoster && (
                 <TouchableOpacity
-                    style={styles.editPostButton}
-                    onPress={() => navigation.navigate('editpost', { post })}
+                    style={styles.editvideoDataButton}
+                    onPress={() => navigation.navigate('editvideo', { videoData })}
                 >
-                    <Text style={styles.editPostButtonText}>Edit Post</Text>
+                    <Text style={styles.editvideoDataButtonText}>Edit videoData</Text>
                 </TouchableOpacity>
             )}
-            {/* <Image source={{ uri: post.image }} style={styles.image} /> */}
+            {/* <Image source={{ uri: videoData.image }} style={styles.image} /> */}
             {
-                post.image && (post.image.endsWith('.mp4') || post.image.endsWith('.mov')) ? (
+                videoData.image && (videoData.image.endsWith('.mp4') || videoData.image.endsWith('.mov')) ? (
                     <Video
-                  source={{ uri: post.image }}
+                  source={{ uri: videoData.image }}
                   style={styles.image}
                   useNativeControls
                   resizeMode="contain"
@@ -115,11 +115,11 @@ const PostDetail = ({ route, navigation }) => {
                 //   {...isLoading && <ActivityIndicator size="large" color="#0000ff" />}
                     />
                 ) : (
-                    <Image source={{ uri: post.image }} style={styles.image} />
+                    <Image source={{ uri: videoData.image }} style={styles.image} />
                 )
             }
 
-            {post.caption && <Text style={styles.caption}>{post.caption}</Text>}
+            {videoData.caption && <Text style={styles.caption}>{videoData.caption}</Text>}
             <View style={styles.iconContainer}>
                 <TouchableOpacity onPress={handleLike}>
                     <Icon name={likes.includes(currentUser.uid) ? "heart" : "heart-outline"} size={30} color="red" />
@@ -138,7 +138,7 @@ const PostDetail = ({ route, navigation }) => {
                 placeholder="Write a comment..."
             />
             <TouchableOpacity onPress={handleSaveComment} style={styles.commentButton}>
-                <Text style={styles.commentButtonText}>Post Comment</Text>
+                <Text style={styles.commentButtonText}>videoData Comment</Text>
             </TouchableOpacity>
             <FlatList
                 data={comments}
@@ -214,16 +214,16 @@ const styles = StyleSheet.create({
         padding: 10, // Provide some padding around the text
         color: '#000', // Adjust color as needed
     },
-    editPostButton: {
+    editvideoDataButton: {
         backgroundColor: '#4F8EF7',
         padding: 10,
         borderRadius: 5,
         marginTop: 50,
     },
-    editPostButtonText: {
+    editvideoDataButtonText: {
         color: '#FFFFFF',
         textAlign: 'center',
     },
 });
 
-export default PostDetail;
+export default PlaylistDetail;

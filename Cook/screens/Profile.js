@@ -4,6 +4,8 @@ import { db } from '../firebase'; // Your Firebase configuration file
 import { getAuth } from 'firebase/auth';
 import { doc, collection, query, where, getDocs, getDoc } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
+import { Video } from 'expo-av';
 
 
 
@@ -11,6 +13,9 @@ const Profile = ({ navigation }) => {
   const [userName, setUserName] = useState({ name: 'Loading...' });
   const [userPosts, setUserPosts] = useState([]);
   const [userProfile, setUserProfile] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isChef, setIsChef] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -26,6 +31,7 @@ const Profile = ({ navigation }) => {
             const userData = docSnap.data();
             setUserName({ ...userName, ...docSnap.data() }); // Assuming the field for the user's name is 'name'
             setUserProfile(userData);
+
           } else {
             console.log('No user data found');
           }
@@ -34,7 +40,39 @@ const Profile = ({ navigation }) => {
           console.error('Error fetching user data:', error);
         });
     };
-  }, [user]);
+  }, [user, userProfile]);
+
+    // Fetch user's role and subscription status
+    useEffect(() => {
+      const fetchUserRoleAndSubscription = async () => {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userSnapshot = await getDoc(userDocRef);
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.data();
+          setIsChef(userData.role === 'chef');
+          setIsSubscribed(userData.subscribers?.includes(currentUser.uid));
+        }
+      };
+  
+      fetchUserRoleAndSubscription();
+    }, [user.uid]);
+  
+    // Function to handle subscription
+    // const handleSubscribe = async () => {
+    //   // Update the chef's subscribers
+    //   const chefRef = doc(db, 'users', user.uid);
+    //   await updateDoc(chefRef, {
+    //     subscribers: arrayUnion(currentUser.uid),
+    //   });
+  
+    //   // Update the current user's subscribedTo list
+    //   const currentUserRef = doc(db, 'users', currentUser.uid);
+    //   await updateDoc(currentUserRef, {
+    //     subscribedTo: arrayUnion(user.uid),
+    //   });
+  
+    //   setIsSubscribed(true);
+    // };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -47,14 +85,17 @@ const Profile = ({ navigation }) => {
         fetchedPosts.push({
           id: doc.id,
           ...doc.data(),
+
         });
       });
+      //console.log(fetchedPosts);
       setUserPosts(fetchedPosts); // Set the user's posts
+      //console.log(userPosts);
     }
 
 
     fetchUserData();
-  }, []);
+  }, [userPosts]);
 
   return (
     <View style={styles.container}>
@@ -67,6 +108,14 @@ const Profile = ({ navigation }) => {
           <Icon name="create-outline" size={24} color="#4F8EF7" />
         </TouchableOpacity>
       </View>
+
+      {isChef && (
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('playlist', {userId: user.uid})}>
+            <Text style={styles.buttonText}>Playlist</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Upload Button */}
       <TouchableOpacity style={styles.uploadButton} onPress={() => navigation.navigate('add')} >
@@ -92,8 +141,29 @@ const Profile = ({ navigation }) => {
           data={userPosts}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
+
             <TouchableOpacity onPress={() => navigation.navigate('postdetail', { post: item })}>
-              <Image source={{ uri: item.image }} style={styles.image} />
+              {/* <Image source={{ uri: item.image }} style={styles.image} /> */}
+              {
+                item.image && (item.image.endsWith('.mp4') || item.image.endsWith('.mov')) ? (
+                  <Video
+                  source={{ uri: item.image }}
+                  style={styles.image}
+                  useNativeControls
+                  resizeMode="contain"
+                  // shouldPlay // Auto-play the video
+                  // isLooping // Loop the video
+                  // onError={(e) => console.error("Error loading video", e)}
+                  
+                  // onLoadStart={() => setIsLoading(true)}
+                  // onLoad={() => setIsLoading(false)}
+                  /> 
+                ) : (
+                  <Image source={{ uri: item.image }} style={styles.image} />
+                )
+              }
+
+
             </TouchableOpacity>
           )}
           numColumns={3}
@@ -116,6 +186,7 @@ const Profile = ({ navigation }) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -192,6 +263,23 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 2,
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  button: {
+    backgroundColor: '#4F8EF7',
+    padding: 10,
+    marginHorizontal: 5,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+  },
+  subscribedText: {
+    color: 'green',
   },
 });
 

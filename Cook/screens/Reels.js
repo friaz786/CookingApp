@@ -59,7 +59,7 @@ export default function Add({ navigation }) {
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       // to add videos as well just alter this line
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       allowsEditing: true,
       aspect: [3, 4],
       quality: 0.2,
@@ -71,7 +71,7 @@ export default function Add({ navigation }) {
 
   const OpenCam = async () => {
     let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       aspect: [3, 4],
       quality: 0.2,
     });
@@ -202,7 +202,7 @@ export default function Add({ navigation }) {
 {/* end */}
       <View style={styles.picContainer}>
       {!isRecording && !image ? (
-        <TouchableOpacity onPress={takePicture}>
+        <TouchableOpacity >
           <FontAwesome
             name="circle-o"
             color={"#3a3a3a"}
@@ -213,7 +213,7 @@ export default function Add({ navigation }) {
       ) : (
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("save", { image });
+            navigation.navigate("saveplaylist", { image });
           }}
         >
           <AntDesign

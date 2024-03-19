@@ -4,54 +4,54 @@ import { db } from '../firebase';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const EditPost = ({ route, navigation }) => {
-  const { post } = route.params;
-  const [caption, setCaption] = useState(post.caption || '');
+const EditVideo = ({ route, navigation }) => {
+  const { videoData } = route.params;
+  const [caption, setCaption] = useState(videoData.caption || '');
 
   useEffect(() => {
-    // Optionally, load the post data if not passed through navigation params
+    // Optionally, load the videoData data if not passed through navigation params
   }, []);
 
 //   const handleSave = async () => {
-//     const postRef = doc(db, 'posts', post.id);
+//     const videoDataRef = doc(db, 'videoDatas', videoData.id);
 //     try {
-//       await updateDoc(postRef, { caption });
+//       await updateDoc(videoDataRef, { caption });
 //       navigation.goBack(); // Or navigate to a specific screen
 //     } catch (error) {
-//       console.error("Error updating post:", error);
+//       console.error("Error updating videoData:", error);
 //     }
 //   };
 
   const handleSave = async () => {
-    const postRef = doc(db, 'posts', post.id);
+    const videoDataRef = doc(db, 'playlist', videoData.id);
     try {
-      await updateDoc(postRef, { caption });
-      // Assuming you've updated the local 'post' object's caption as well
-      // Navigate back to PostDetail with the updated post object
-      navigation.navigate('postdetail', { post: { ...post, caption } });
+      await updateDoc(videoDataRef, { caption });
+      // Assuming you've updated the local 'videoData' object's caption as well
+      // Navigate back to videoDataDetail with the updated videoData object
+      navigation.navigate('playlistdetail', { videoData: { ...videoData, caption } });
     } catch (error) {
-      console.error("Error updating post:", error);
+      console.error("Error updating videoData:", error);
     }
   };
 
   const handleDelete = () => {
     Alert.alert(
-      "Delete Post",
-      "Are you sure you want to delete this post?",
+      "Delete videoData",
+      "Are you sure you want to delete this videoData?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Confirm", onPress: () => deletePost() }
+        { text: "Confirm", onPress: () => deletevideoData() }
       ]
     );
   };
 
-  const deletePost = async () => {
-    const postRef = doc(db, 'posts', post.id);
+  const deletevideoData = async () => {
+    const videoDataRef = doc(db, 'playlist', videoData.id);
     try {
-      await deleteDoc(postRef);
+      await deleteDoc(videoDataRef);
       navigation.navigate('My Profile'); // Or navigate to the screen you prefer
     } catch (error) {
-      console.error("Error deleting post:", error);
+      console.error("Error deleting videoData:", error);
     }
   };
 
@@ -72,7 +72,7 @@ const EditPost = ({ route, navigation }) => {
         onPress={handleSave}
       />
       <Button
-        title="Delete Post"
+        title="Delete videoData"
         color="red"
         onPress={handleDelete}
       />
@@ -101,4 +101,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditPost;
+export default EditVideo;

@@ -3,6 +3,7 @@ import CalendarScreen from "./CalendarScreen";
 import Home from "./Home";
 import Profile from "./Profile";
 import UserSearch from "./UserSearch";
+import Feed from "./Feed";
 import DrawerContent from "../components/DrawerContent";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 //import NavigationStack from "./index";
@@ -39,8 +40,8 @@ export default function DrawerNavigation() {
           <Ionicons name="calendar-outline" size={24} color={color} />
         ),
       }} />
-      <Drawer.Screen name="Edit Profile" component={Profile} options={{
-        headerTitle: "Edit Profile",
+      <Drawer.Screen name="My Profile" component={Profile} options={{
+        headerTitle: "My Profile",
         drawerActiveBackgroundColor: "#e4efe4",
         drawerActiveTintColor: "#00BE00",
         drawerInactiveTintColor: "#1d1d1d",
@@ -67,8 +68,8 @@ export default function DrawerNavigation() {
           <FontAwesome name="user-circle-o" size={24} color={color} />
         ),
       }} />
-      {/* <Drawer.Screen name="Social Media" component={NavigationStack} options={{
-        headerTitle: "",
+      <Drawer.Screen name="Feed" component={Feed} options={{
+        headerTitle: "Feed",
         drawerActiveBackgroundColor: "#e4efe4",
         drawerActiveTintColor: "#00BE00",
         drawerInactiveTintColor: "#1d1d1d",
@@ -80,7 +81,7 @@ export default function DrawerNavigation() {
         drawerIcon: ({ color }) => (
           <Ionicons name="calendar-outline" size={24} color={color} />
         ),
-      }} /> */}
+      }} />
     </Drawer.Navigator>
   </>)
 
