@@ -7,6 +7,9 @@ import { Ionicons, FontAwesome, MaterialIcons, MaterialCommunityIcons} from "@ex
 import HealthForm from "./HealthForm";
 import MyMealPlans from "./MyMealPlans";
 import MyGrocery from "./MyGrocery";
+import UserSearch from "./UserSearch";
+import Feed from "./Feed";
+
 
 const Drawer = createDrawerNavigator();
 export default function DrawerNavigation(){
@@ -40,8 +43,8 @@ export default function DrawerNavigation(){
               <Ionicons name="calendar-outline" size={24} color={color} />
             ),
           }}/>
-          <Drawer.Screen name="Edit Profile" component={Profile} options={{
-            headerTitle: "Edit Profile",
+          <Drawer.Screen name="My Profile" component={Profile} options={{
+            headerTitle: "My Profile",
             drawerActiveBackgroundColor: "#e4efe4",
             drawerActiveTintColor: "#00BE00",
             drawerInactiveTintColor: "#1d1d1d",
@@ -54,6 +57,34 @@ export default function DrawerNavigation(){
               <FontAwesome name="user-circle-o" size={24} color={color} />
             ),
           }}/>
+          <Drawer.Screen name="User Search" component={UserSearch} options={{
+        headerTitle: "User Search",
+        drawerActiveBackgroundColor: "#e4efe4",
+        drawerActiveTintColor: "#00BE00",
+        drawerInactiveTintColor: "#1d1d1d",
+        headerBackgroundContainerStyle: { display: "none" },
+        drawerLabelStyle: {
+          fontSize: 15,
+        },
+        headerTransparent: false,
+        drawerIcon: ({ color }) => (
+          <FontAwesome name="user-circle-o" size={24} color={color} />
+        ),
+      }} />
+      <Drawer.Screen name="Feed" component={Feed} options={{
+        headerTitle: "Feed",
+        drawerActiveBackgroundColor: "#e4efe4",
+        drawerActiveTintColor: "#00BE00",
+        drawerInactiveTintColor: "#1d1d1d",
+        headerBackgroundContainerStyle: { display: "none" },
+        drawerLabelStyle: {
+          fontSize: 15,
+        },
+        headerTransparent: true,
+        drawerIcon: ({ color }) => (
+          <Ionicons name="calendar-outline" size={24} color={color} />
+        ),
+      }} />
           <Drawer.Screen name="Health Form" component={HealthForm} options={{
             headerTitle: "",
             drawerActiveBackgroundColor: "#e4efe4",

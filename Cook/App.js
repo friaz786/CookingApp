@@ -20,6 +20,21 @@ import MyMealPlans from "./screens/MyMealPlans";
 import MealDetail from "./screens/MealDetail";
 import GroceryList from "./screens/GroceryList";
 import MyGrocery from "./screens/MyGrocery";
+import EditProfile from "./screens/EditProfile";
+import Add from "./screens/Add";
+import Save from "./screens/Save";
+import Fetch from "./screens/Fetch";
+import OtherUserProfile from "./screens/OtherUserProfile";
+import PostDetail from "./screens/PostDetail";
+import EditPost from "./screens/EditPost";
+import Playlist from "./screens/Playlist";
+import Reels from "./screens/Reels";
+import SavePlaylist from "./screens/SavePlaylist";
+import OtherPlaylist from "./screens/OtherPlaylist";
+import PlaylistDetail from "./screens/PlaylistDetail";
+import EditVideo from "./screens/EditVideo";
+import Meeting from "./screens/Meeting";
+import MeetingDetail from "./screens/MeetingDetail";
 //import RecipeDetail from './RecipeDetail';
 
 const Stack = createNativeStackNavigator();
@@ -64,7 +79,13 @@ export default function App() {
             headerShown: false,
           }}
         />
-
+        <Stack.Screen
+          name="editprofile"
+          component={EditProfile}
+          options={{
+            headerShown: false,
+          }}
+        />
         <Stack.Screen
           name="scanner"
           component={Scanner}
@@ -98,6 +119,104 @@ export default function App() {
         <Stack.Screen
           name="healthform"
           component={HealthForm}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="add"
+          component={Add}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="save"
+          component={Save}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="fetch"
+          component={Fetch}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="otheruserprofile"
+          component={OtherUserProfile}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="postdetail"
+          component={PostDetail}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="editpost"
+          component={EditPost}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="playlist"
+          component={Playlist}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="reels"
+          component={Reels}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="saveplaylist"
+          component={SavePlaylist}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="otherplaylist"
+          component={OtherPlaylist}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="playlistdetail"
+          component={PlaylistDetail}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="editvideo"
+          component={EditVideo}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="meeting"
+          component={Meeting}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="meetingdetail"
+          component={MeetingDetail}
           options={{
             headerShown: false,
           }}
