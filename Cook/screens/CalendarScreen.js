@@ -6,34 +6,34 @@ const CalendarScreen = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState('');
 
   const onDayPress = (day) => {
-    // Create a Date object from the dateString
     const date = new Date(day.dateString);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to 00:00 to compare only dates
+    today.setHours(0, 0, 0, 0);
   
-    // Check if the selected date is in the past
     if (date < today) {
-      // Show an alert if the selected date is in the past
       Alert.alert("Invalid Date", "Please select a future date.");
     } else {
-      // Format the date using Intl.DateTimeFormat
       const formattedDate = new Intl.DateTimeFormat('en-GB', {
         day: 'numeric', month: 'long', year: 'numeric'
       }).format(date);
     
       setSelectedDate(formattedDate);
-      console.log(formattedDate); // This will log the date in the format "23 June 2024"
     }
   };
-  
 
   const onCreateMealPlan = () => {
-    // Navigate to Meal Plan creation screen and pass the selected date
-    navigation.navigate('createmealplan', { date: selectedDate });
+    if (!selectedDate) {
+      Alert.alert("No Date Selected", "You must select a date to create a meal plan.");
+    } else {
+      navigation.navigate('createmealplan', { date: selectedDate });
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Select date for Meal Plan</Text>
       <Calendar
         onDayPress={onDayPress}
@@ -44,7 +44,15 @@ const CalendarScreen = ({ navigation }) => {
             selectedDotColor: 'orange',
           },
         }}
-        // Other calendar properties
+        theme={{
+          selectedDayBackgroundColor: '#4CAF50',
+          todayTextColor: '#FF9800',
+          arrowColor: '#4CAF50',
+          monthTextColor: '#212121',
+          textDayFontSize: 16,
+          textMonthFontSize: 18,
+          textDayHeaderFontSize: 16,
+        }}
       />
       <TouchableOpacity style={styles.button} onPress={onCreateMealPlan}>
         <Text style={styles.buttonText}>Create Meal Plan</Text>
@@ -56,26 +64,40 @@ const CalendarScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'space-between', // Push the button to the bottom
+    justifyContent: 'center',
+    backgroundColor: '#FFF',
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
+    fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 10,
+    color: '#212121',
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginLeft: 10,
+    marginTop: 10,
+    padding: 10,
+  },
+  backButtonText: {
+    color: '#007AFF',
+    fontSize: 18,
   },
   button: {
-    backgroundColor: 'green',
-    padding: 15,
-    borderRadius: 5,
-    marginHorizontal: 50,
-    marginBottom: 20,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignSelf: 'center',
+    marginTop: 20,
   },
   buttonText: {
     textAlign: 'center',
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 18,
+    fontWeight: '500',
   },
-  // Additional styles
 });
 
 export default CalendarScreen;

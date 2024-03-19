@@ -1,77 +1,204 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, TextInput, StyleSheet, FlatList, View, TouchableOpacity, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, } from 'react-native';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { db } from "../firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
+import Icon from "react-native-vector-icons/Ionicons";
+import { getAuth } from "firebase/auth";
 
-export default function SearchRecipe({ navigation }) {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [selectedRecipe, setSelectedRecipe] = useState(null);
+const SearchRecipe = ({ navigation, route }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [recipes, setRecipes] = useState([]);
+  const { date, mealType } = route.params;
+  const auth = getAuth();
 
-    const handleSearch = async (queryText) => {
-        setSearchQuery(queryText);
-        if (queryText.length > 2) {
-            const recipesRef = collection(db, 'recipes');
-            const q = query(recipesRef, where('name', '>=', queryText), where('name', '<=', queryText + '\uf8ff'));
-            try {
-                const querySnapshot = await getDocs(q);
-                const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setSearchResults(results);
-            } catch (error) {
-                console.error('Error fetching recipes:', error);
-            }
-        } else {
-            setSearchResults([]);
+  // Sugary ingredients array
+  const sugaryIngredients = [
+    "sugar",
+    "syrup",
+    "honey",
+    "molasses",
+    "corn syrup",
+    "high-fructose corn syrup",
+    "dextrose",
+    "fructose",
+  ];
+  const bpConcerningIngredients = ["salt", "sodium", "caffeine", "sugar"];
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      const trimmedQuery = searchQuery.trim().toLowerCase(); // Convert search query to lowercase
+
+      if (trimmedQuery === "") {
+        setRecipes([]);
+        return;
+      }
+
+      try {
+        // Query against the lowercase name
+        const q = query(
+          collection(db, "recipes"),
+          where("name", ">=", trimmedQuery),
+          where("name", "<=", trimmedQuery + "\uf8ff")
+        );
+        const querySnapshot = await getDocs(q);
+        const fetchedRecipes = [];
+        querySnapshot.forEach((doc) => {
+          fetchedRecipes.push({ id: doc.id, ...doc.data() });
+        });
+        setRecipes(fetchedRecipes);
+        //console.log(date);
+      } catch (error) {
+        console.log("Error getting documents: ", error);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      fetchRecipes();
+    }, 500); // Debounce the search to reduce database queries
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const checkHealthConcernsAndNavigate = async (recipe) => {
+    // Assuming healthData is structured with hasDiabetes and hasBloodPressure
+    const userDocRef = doc(db, "users", auth.currentUser.uid);
+
+    try {
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists() && userDocSnap.data().healthData) {
+        const healthData = userDocSnap.data().healthData;
+        let alertMessage = "";
+
+        if (healthData.hasDiabetes) {
+          // Check for sugary ingredients
+          const hasSugaryIngredient = recipe.ingredients.some((ingredient) =>
+            sugaryIngredients.includes(ingredient.toLowerCase())
+          );
+
+          if (hasSugaryIngredient) {
+            alertMessage +=
+              "This recipe contains ingredients that could be harmful for your health due to diabetes, so adjust sugar accordingly.\n\n";
+          }
         }
-    };
 
-    const handleSelectRecipe = (recipe) => {
-        setSelectedRecipe(recipe);
-        // You can use navigation here to navigate to the selected recipe detail screen if needed
-        // Example: navigation.navigate('RecipeDetailScreen', { recipeId: recipe.id });
-    };
+        if (healthData.hasBloodPressure) {
+          // Check for BP concerning ingredients
+          const hasBPConcerningIngredient = recipe.ingredients.some(
+            (ingredient) =>
+              bpConcerningIngredients.includes(ingredient.toLowerCase())
+          );
 
-    const renderRecipeItem = ({ item }) => (
-        <View style={styles.card}>
-            <Text style={styles.cardText}>{item.name}</Text>
-            {/* Add additional recipe details you want to show */}
-            <TouchableOpacity onPress={() => handleSelectRecipe(item)}>
-                <Text>View Recipe</Text>
-            </TouchableOpacity>
-        </View>
-    );
+          if (hasBPConcerningIngredient) {
+            alertMessage +=
+              "This recipe contains ingredients that could be harmful for high blood pressure patients, so adjust ingredients accordingly.\n\n";
+          }
+        }
 
-    return (
-        <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={true}>
-        <SafeAreaView style={styles.container}>
-            <View style={styles.searchContainer}>
-                <TextInput
-                    style={styles.searchInput}
-                    value={searchQuery}
-                    onChangeText={handleSearch}
-                    placeholder="Search recipes..."
-                />
-            </View>
-            <FlatList
-                data={searchResults}
-                renderItem={renderRecipeItem}
-                keyExtractor={item => item.id}
-                style={{ marginTop: 10 }}
-            />
-        </SafeAreaView>
-        </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-    );
-}
+        if (alertMessage) {
+          // Show combined alert if any health concerns are detected
+          Alert.alert("Health Alert", alertMessage.trim(), [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Proceed Anyway",
+              onPress: () =>
+                navigation.navigate("AddMeal", { recipe, date, mealType }),
+            },
+          ]);
+        } else {
+          // Safe to proceed if no alerts
+          navigation.navigate("AddMeal", { recipe, date, mealType });
+        }
+      } else {
+        // No healthData found, proceed
+        navigation.navigate("AddMeal", { recipe, date, mealType });
+      }
+    } catch (error) {
+      console.error("Error checking health data: ", error);
+      // Handle error or proceed with navigation as needed
+    }
+  };
 
-// Styles remain the same as before
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={() => navigation.goBack()}
+      >
+        <Icon name="arrow-back" size={30} color="#000" />
+      </TouchableOpacity>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Search recipe by name"
+        value={searchQuery}
+        onChangeText={(text) => setSearchQuery(text)}
+      />
+      <FlatList
+        data={recipes}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => checkHealthConcernsAndNavigate(item)}
+          >
+            <Text style={styles.recipeItem}>{item.name}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+};
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#f7f7f7",
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF", // Use a light background for the whole screen
+    padding: 20,
+  },
+  input: {
+    height: 50, // Increase the height for better touch area
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#CCCCCC", // Softer border color
+    borderRadius: 25, // Rounder corners
+    padding: 15,
+    fontSize: 16, // Slightly larger font size
+    backgroundColor: "#F5F5F5", // Light grey background for the input field
+  },
+  recipeItem: {
+    padding: 15, // Increased padding for more space inside the boxes
+    marginTop: 10, // Add more space between items
+    backgroundColor: "#4CAF50",
+    borderWidth: 1, // Removing border as the background color is enough contrast
+    borderRadius: 20, // More pronounced rounded corners
+    color: "white",
+    fontSize: 18, // Larger font size for readability
+    shadowColor: "#000", // Shadow for iOS
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    searchContainer: {
-        backgroundColor: "#f2f2f2"
-    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4, // Elevation for Android
+  },
+  recipe: {
+    borderRadius: 20, // More pronounced rounded corners
+  },
 });
+
+export default SearchRecipe;

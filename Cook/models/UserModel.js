@@ -1,17 +1,19 @@
 class UserModel {
-    constructor(name, phoneNumber, role) {
-      this.name = name;
-      this.phoneNumber = phoneNumber;
-      this.role = role;
-    }
-  
-    toFirestore() {
-      return {
-        name: this.name,
-        phoneNumber: this.phoneNumber,
-        role: this.role,
-      };
-    }
+  constructor(name, phoneNumber, role, cuisine) {
+    this.name = name;
+    this.phoneNumber = phoneNumber;
+    this.role = role;
+    this.cuisines = cuisines;
   }
-  
-  export default UserModel;
+
+  toFirestore() {
+    return {
+      name: this.name,
+      phoneNumber: this.phoneNumber,
+      role: this.role,
+      cuisines: this.cuisines,
+    };
+  }
+}
+
+export default UserModel;
