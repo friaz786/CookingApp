@@ -3,12 +3,13 @@ import CalendarScreen from "./CalendarScreen";
 import Home from "./Home";
 import Profile from "./Profile";
 import DrawerContent from "../components/DrawerContent";
-import { Ionicons, FontAwesome, MaterialIcons, MaterialCommunityIcons} from "@expo/vector-icons";
+import { Ionicons, FontAwesome, MaterialIcons, MaterialCommunityIcons, Entypo} from "@expo/vector-icons";
 import HealthForm from "./HealthForm";
 import MyMealPlans from "./MyMealPlans";
 import MyGrocery from "./MyGrocery";
 import UserSearch from "./UserSearch";
 import Feed from "./Feed";
+import MyEventPlans from "./MyEventPlans";
 
 
 const Drawer = createDrawerNavigator();
@@ -68,7 +69,7 @@ export default function DrawerNavigation(){
         },
         headerTransparent: false,
         drawerIcon: ({ color }) => (
-          <FontAwesome name="user-circle-o" size={24} color={color} />
+          <FontAwesome name="search" size={24} color={color} />
         ),
       }} />
       <Drawer.Screen name="Feed" component={Feed} options={{
@@ -111,6 +112,21 @@ export default function DrawerNavigation(){
             headerTransparent: false,
             drawerIcon: ({ color }) => (
               <MaterialIcons name="local-grocery-store" size={24} color={color} />
+            ),
+          }}/>
+          }
+          {<Drawer.Screen name="Event Planner" component={MyEventPlans} options={{
+            headerTitle: "My Events",
+            drawerActiveBackgroundColor: "#e4efe4",
+            drawerActiveTintColor: "#00BE00",
+            drawerInactiveTintColor: "#1d1d1d",
+            headerBackgroundContainerStyle: { display: "none" },
+            drawerLabelStyle: {
+              fontSize: 15,
+            },
+            headerTransparent: false,
+            drawerIcon: ({ color }) => (
+              <Entypo name="cake" size={24} color={color} />
             ),
           }}/>
           }

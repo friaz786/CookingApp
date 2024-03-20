@@ -6,12 +6,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  TextInput,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { Ionicons } from "@expo/vector-icons";
+import EventSearch from "./EventSearch";
 
-const CalendarScreen = ({ navigation }) => {
+const EventCalendar = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState("");
+  const [eventName, setEventName] = useState("");
 
   const onDayPress = (day) => {
     const date = new Date(day.dateString);
@@ -21,24 +24,22 @@ const CalendarScreen = ({ navigation }) => {
     if (date < today) {
       Alert.alert("Invalid Date", "Please select a future date.");
     } else {
-      const formattedDate = new Intl.DateTimeFormat("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }).format(date);
-
-      setSelectedDate(formattedDate);
+      setSelectedDate(day.dateString);
     }
   };
 
-  const onCreateMealPlan = () => {
+  const onCreateEventPlan = () => {
     if (!selectedDate) {
       Alert.alert(
         "No Date Selected",
-        "You must select a date to create a meal plan."
+        "You must select a date to create an event plan."
       );
+    } else if (!eventName.trim()) {
+      Alert.alert("Event Name Missing", "Please enter an event name.");
     } else {
-      navigation.navigate("createmealplan", { date: selectedDate });
+      // Assuming 'CreateEventPlan' is the route for your event plan creation screen
+      // Pass both eventName and selectedDate to the next screen
+      navigation.navigate("searchrecipe", { eventName, date: selectedDate });
     }
   };
 
@@ -50,7 +51,14 @@ const CalendarScreen = ({ navigation }) => {
       >
         <Ionicons name="chevron-back" size={30} color="#000" />
       </TouchableOpacity>
-      <Text style={styles.title}>Select date for Meal Plan</Text>
+      <Text style={styles.title}>Enter Event Name:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Event Name"
+        value={eventName}
+        onChangeText={setEventName}
+      />
+      <Text style={styles.title}>Select Date for Event</Text>
       <Calendar
         onDayPress={onDayPress}
         markedDates={{
@@ -70,50 +78,65 @@ const CalendarScreen = ({ navigation }) => {
           textDayHeaderFontSize: 16,
         }}
       />
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={onCreateMealPlan}>
-          <Text style={styles.buttonText}>Create Meal Plan</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate("EventSearch", { date: selectedDate, eventName })
+        }
+      >
+        <Text style={styles.buttonText}>Create Event Plan</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#FFF",
+    backgroundColor: "#ffe6e6",
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: -60,
-    marginBottom: 10,
+    marginTop: 10,
     color: "#212121",
   },
-  backIcon: {
-    position: "absolute",
-    top: 40,
-    left: 20,
+  input: {
+    height: 40,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#CCCCCC",
+    borderRadius: 5,
+    padding: 10,
   },
-  buttonContainer: {
-    width: "100%", // Take the full width of the container
-    alignItems: "center", // Center-align the button horizontally
+  backButton: {
+    alignSelf: "flex-start",
+    marginLeft: 10,
+    marginTop: 10,
+    padding: 10,
+  },
+  backButtonText: {
+    color: "#007AFF",
+    fontSize: 18,
   },
   button: {
     backgroundColor: "#4CAF50",
-    width: "80%",
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignSelf: "center",
     marginTop: 20,
   },
   buttonText: {
+    textAlign: "center",
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "500",
   },
 });
 
-export default CalendarScreen;
+export default EventCalendar;

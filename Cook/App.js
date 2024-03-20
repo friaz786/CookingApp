@@ -35,6 +35,11 @@ import PlaylistDetail from "./screens/PlaylistDetail";
 import EditVideo from "./screens/EditVideo";
 import Meeting from "./screens/Meeting";
 import MeetingDetail from "./screens/MeetingDetail";
+import MyEventPlans from "./screens/MyEventPlans";
+import EventCalendar from "./screens/EventCalendar";
+import AddRecipeForEvent from "./screens/AddRecipeForEvent";
+import EventSearch from "./screens/EventSearch";
+import EventDetails from "./screens/EventDetails";
 //import RecipeDetail from './RecipeDetail';
 
 const Stack = createNativeStackNavigator();
@@ -57,7 +62,6 @@ export default function App() {
             headerShown: false,
           }}
         />
-
         <Stack.Screen
           name="navigation"
           component={DrawerNavigation}
@@ -93,7 +97,6 @@ export default function App() {
             headerShown: false,
           }}
         />
-
         <Stack.Screen
           name="calendar"
           component={CalendarScreen}
@@ -101,7 +104,6 @@ export default function App() {
             headerShown: false,
           }}
         />
-
         <Stack.Screen
           name="createmealplan"
           component={CreateMealPlan}
@@ -252,6 +254,41 @@ export default function App() {
         <Stack.Screen
           name="MyGrocery"
           component={MyGrocery}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="MyEventPlans"
+          component={MyEventPlans}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="EventCalendar"
+          component={EventCalendar}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="AddRecipeForEvent"
+          component={AddRecipeForEvent}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="EventSearch"
+          component={EventSearch}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="EventDetails"
+          component={EventDetails}
           options={{
             headerShown: false,
           }}

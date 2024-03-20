@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Text, TouchableOpacity, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Make sure to install this package
-import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  Text,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons"; // Make sure to install this package
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
 const ForgotPassword = ({ navigation }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const handleResetPassword = () => {
     const auth = getAuth();
@@ -25,7 +32,10 @@ const ForgotPassword = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Back Icon */}
-      <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={() => navigation.goBack()}
+      >
         <Icon name="arrow-back" size={30} color="#000" />
       </TouchableOpacity>
 
@@ -33,9 +43,10 @@ const ForgotPassword = ({ navigation }) => {
       <View style={styles.content}>
         <Text style={styles.header}>Reset Password</Text>
         <Text style={styles.instruction}>
-          Please enter your email address to receive a link to create a new password via email.
+          Please enter your email address to receive a link to create a new
+          password via email.
         </Text>
-        
+
         {/* Email Input Field */}
         <TextInput
           style={styles.input}
@@ -57,55 +68,61 @@ const ForgotPassword = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    alignItems: "center",
+    justifyContent: "flex-start",
     paddingTop: 50, // Adjust the padding as needed
-    backgroundColor: '#f7f7f7',
+    backgroundColor: "#ffe6e6",
   },
   backIcon: {
-    position: 'absolute',
+    position: "absolute",
     top: 35, // Adjust top and left as per the design requirements
     left: 10,
     zIndex: 10, // Make sure the touchable opacity appears above other elements
   },
   content: {
-    marginTop: '45%', // Adjust the margin as needed
-    width: '80%',
+    marginTop: "45%", // Adjust the margin as needed
+    width: "80%",
   },
   header: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   instruction: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     marginBottom: 20,
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   button: {
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#5cb85c',
-    borderRadius: 8,
-    alignItems: 'center',
+    backgroundColor: "#4CAF50",
+    width: "100%",
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 10,
+    marginBottom: "7%",
+    marginTop: 17,
   },
   buttonText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

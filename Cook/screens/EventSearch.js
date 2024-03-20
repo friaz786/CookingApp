@@ -20,10 +20,10 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { getAuth } from "firebase/auth";
 
-const SearchRecipe = ({ navigation, route }) => {
+const EventSearch = ({ navigation, route }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [recipes, setRecipes] = useState([]);
-  const { date, mealType } = route.params;
+  const { date, eventName } = route.params;
   const auth = getAuth();
 
   // Sugary ingredients array
@@ -61,7 +61,6 @@ const SearchRecipe = ({ navigation, route }) => {
           fetchedRecipes.push({ id: doc.id, ...doc.data() });
         });
         setRecipes(fetchedRecipes);
-        //console.log(date);
       } catch (error) {
         console.log("Error getting documents: ", error);
       }
@@ -117,20 +116,20 @@ const SearchRecipe = ({ navigation, route }) => {
             {
               text: "Proceed Anyway",
               onPress: () =>
-                navigation.navigate("AddMeal", {
+                navigation.navigate("AddRecipeForEvent", {
                   recipe,
                   date,
-                  mealType,
+                  eventName,
                 }),
             },
           ]);
         } else {
           // Safe to proceed if no alerts
-          navigation.navigate("AddMeal", { recipe, date, mealType });
+          navigation.navigate("AddRecipeForEvent", { recipe, date, eventName });
         }
       } else {
         // No healthData found, proceed
-        navigation.navigate("AddMeal", { recipe, date, mealType });
+        navigation.navigate("AddRecipeForEvent", { recipe, date, eventName });
       }
     } catch (error) {
       console.error("Error checking health data: ");
@@ -205,4 +204,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchRecipe;
+export default EventSearch;

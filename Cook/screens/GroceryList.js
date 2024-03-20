@@ -7,9 +7,12 @@ import {
   FlatList,
   TextInput,
   Button,
+  SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { getAuth } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { collection, getDocs, query, setDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -103,7 +106,7 @@ const GroceryList = ({ navigation }) => {
         style={styles.backIcon}
         onPress={() => navigation.goBack()}
       >
-        <Icon name="arrow-back" size={30} color="#000" />
+        <Ionicons name="chevron-back" size={30} color="#000" />
       </TouchableOpacity>
       <Text style={styles.title}>Grocery List</Text>
       <FlatList
@@ -115,14 +118,14 @@ const GroceryList = ({ navigation }) => {
               <Icon
                 name={item.purchased ? "checkbox-outline" : "square-outline"}
                 size={24}
-                color="#007bff"
+                color="#4CAF50"
               />
             </TouchableOpacity>
             <Text
               style={[styles.itemText, item.purchased && styles.purchased]}
             >{`${index + 1}. ${item.name}`}</Text>
             <TouchableOpacity onPress={() => deleteIngredient(item.id)}>
-              <Icon name="close-circle" size={24} color="red" />
+              <MaterialIcons name="delete-forever" size={24} color="red" />
             </TouchableOpacity>
           </View>
         )}
@@ -134,13 +137,22 @@ const GroceryList = ({ navigation }) => {
           onChangeText={setNewIngredient}
           style={styles.input}
         />
-        <Button title="Add" onPress={addIngredient} />
+        <TouchableOpacity
+          style={styles.addButton}
+          title="Add"
+          onPress={addIngredient}
+        >
+          <Text style={styles.addText}>Add</Text>
+        </TouchableOpacity>
       </View>
-      <Button
+      <TouchableOpacity
+        style={styles.saveButton}
         title="Save Grocery List"
         onPress={saveGroceryList}
         color="#007bff"
-      />
+      >
+        <Text style={styles.addText}>Save Grocery List</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -158,13 +170,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#007bff",
+    color: "black",
     marginBottom: 20,
   },
   ingredientItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "lightgrey",
     padding: 10,
     borderRadius: 5,
     marginBottom: 8,
@@ -186,7 +198,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 20,
+    borderRadius: 10,
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   input: {
     flex: 1,
@@ -196,6 +212,27 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 8,
     backgroundColor: "#ffffff",
+  },
+  addButton: {
+    backgroundColor: "#4CAF50",
+
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 10,
+    marginBottom: "7%",
+    marginTop: 17,
+  },
+  addText: {
+    color: "white",
+  },
+  saveButton: {
+    backgroundColor: "#4CAF50",
+    width: "100%",
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 10,
+    marginBottom: "7%",
+    marginTop: 10,
   },
 });
 
