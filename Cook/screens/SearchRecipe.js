@@ -117,7 +117,11 @@ const SearchRecipe = ({ navigation, route }) => {
             {
               text: "Proceed Anyway",
               onPress: () =>
-                navigation.navigate("AddMeal", { recipe, date, mealType }),
+                navigation.navigate("AddMeal", {
+                  recipe,
+                  date,
+                  mealType,
+                }),
             },
           ]);
         } else {
@@ -129,7 +133,7 @@ const SearchRecipe = ({ navigation, route }) => {
         navigation.navigate("AddMeal", { recipe, date, mealType });
       }
     } catch (error) {
-      console.error("Error checking health data: ", error);
+      console.error("Error checking health data: ");
       // Handle error or proceed with navigation as needed
     }
   };

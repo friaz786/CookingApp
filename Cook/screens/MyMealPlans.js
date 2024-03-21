@@ -17,6 +17,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const MyMealPlans = ({ navigation }) => {
   const [mealPlans, setMealPlans] = useState([]);
@@ -115,7 +116,7 @@ const MyMealPlans = ({ navigation }) => {
               onPress={() => deleteMealPlan(item)}
               style={styles.deleteButton}
             >
-              <Text style={styles.deleteButtonText}>X</Text>
+              <MaterialIcons name="delete-forever" size={24} color="red" />
             </TouchableOpacity>
           </View>
         )}
@@ -135,11 +136,12 @@ const styles = StyleSheet.create({
     marginTop: "15%",
     flex: 1,
     padding: 20,
+    backgroundColor: "#f7f7f7",
   },
   heading: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#007bff",
+    color: "black",
     marginBottom: 20,
     textAlign: "center",
   },
@@ -159,13 +161,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     marginVertical: 8,
-    backgroundColor: "green",
-    borderRadius: 5,
+    backgroundColor: "lightgrey",
+    borderRadius: 10,
     marginTop: "2%",
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   deleteButton: {
     marginLeft: 10,
-    backgroundColor: "red",
     borderRadius: 5,
     padding: 5,
   },
@@ -175,9 +180,12 @@ const styles = StyleSheet.create({
   },
   createButton: {
     padding: 10,
-    backgroundColor: "#007bff",
+    backgroundColor: "#4CAF50",
     borderRadius: 5,
     marginTop: 20,
+    //paddingBottom: 40,
+    marginBottom: 20,
+    borderRadius: 10,
   },
   createButtonText: {
     color: "white",
@@ -198,6 +206,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 5,
+    borderRadius: 10,
   },
   generateListButtonText: {
     color: "#FFFFFF",

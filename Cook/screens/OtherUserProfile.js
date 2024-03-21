@@ -1,15 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { db } from '../firebase'; // Adjust this import according to your file structure
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { query, where, getDocs } from 'firebase/firestore';
-import { Video } from 'expo-av';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  Button,
+  FlatList,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { db } from "../firebase"; // Adjust this import according to your file structure
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  collection,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import Icon from "react-native-vector-icons/Ionicons";
+import { query, where, getDocs } from "firebase/firestore";
+import { Video } from "expo-av";
+import { useStripe } from "@stripe/stripe-react-native";
+import axios from "axios";
 
 const OtherUserProfile = ({ route, navigation }) => {
   const { userId } = route.params;
-  const [userProfile, setUserProfile] = useState({ name: '', followers: [], following: [] });
+  const [userProfile, setUserProfile] = useState({
+    name: "",
+    followers: [],
+    following: [],
+  });
   const [isFollowing, setIsFollowing] = useState(false);
   const auth = getAuth();
   const currentUser = auth.currentUser;
@@ -34,10 +57,12 @@ const OtherUserProfile = ({ route, navigation }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-
       //console.log('userId', userId);
       // Assuming you have a 'posts' collection with a 'userID' field linking to the user's UID
-      const postsRef = query(collection(db, 'posts'), where('userID', '==', userId));
+      const postsRef = query(
+        collection(db, "posts"),
+        where("userID", "==", userId)
+      );
 
       const postsSnap = await getDocs(postsRef);
       const fetchedPosts = [];
@@ -48,19 +73,22 @@ const OtherUserProfile = ({ route, navigation }) => {
         });
       });
       setUserPosts(fetchedPosts); // Set the user's posts
-    }
-
+    };
 
     fetchUserData();
   }, []);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const docRef = doc(db, 'users', userId);
+      const docRef = doc(db, "users", userId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const profileData = docSnap.data();
-        setUserProfile({ ...profileData, id: docSnap.id, following: profileData.following || [], }); // Ensure followers and posts are included
+        setUserProfile({
+          ...profileData,
+          id: docSnap.id,
+          following: profileData.following || [],
+        }); // Ensure followers and posts are included
         setIsFollowing(profileData.followers?.includes(currentUser?.uid)); // Check if current user is following
       } else {
         console.log("No such document!");
@@ -74,36 +102,38 @@ const OtherUserProfile = ({ route, navigation }) => {
     if (!currentUser) return; // Guard clause in case currentUser is null
 
     // Reference to the profile being viewed
-    const viewedUserRef = doc(db, 'users', userId);
+    const viewedUserRef = doc(db, "users", userId);
     // Reference to the current user's document
-    const currentUserRef = doc(db, 'users', currentUser.uid);
+    const currentUserRef = doc(db, "users", currentUser.uid);
 
     try {
       if (isFollowing) {
         // If already following, remove userId from currentUser's following list and vice versa
         await updateDoc(viewedUserRef, {
-          followers: arrayRemove(currentUser.uid)
+          followers: arrayRemove(currentUser.uid),
         });
         await updateDoc(currentUserRef, {
-          following: arrayRemove(userId)
+          following: arrayRemove(userId),
         });
         setIsFollowing(false);
         // Update local state to reflect change
-        setUserProfile(prevState => ({
+        setUserProfile((prevState) => ({
           ...prevState,
-          followers: prevState.followers.filter(followerId => followerId !== currentUser.uid)
+          followers: prevState.followers.filter(
+            (followerId) => followerId !== currentUser.uid
+          ),
         }));
       } else {
         // If not following, add userId to currentUser's following list and vice versa
         await updateDoc(viewedUserRef, {
-          followers: arrayUnion(currentUser.uid)
+          followers: arrayUnion(currentUser.uid),
         });
         await updateDoc(currentUserRef, {
-          following: arrayUnion(userId)
+          following: arrayUnion(userId),
         });
         setIsFollowing(true);
         // Optimistically update local state to reflect change
-        setUserProfile(prevState => ({
+        setUserProfile((prevState) => ({
           ...prevState,
           followers: [...prevState.followers, currentUser.uid],
         }));
@@ -116,46 +146,92 @@ const OtherUserProfile = ({ route, navigation }) => {
 
   useEffect(() => {
     const fetchAdditionalUserData = async () => {
-      const docRef = doc(db, 'users', userId);
+      const docRef = doc(db, "users", userId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setUserIsChef(data.role === 'chef'); // Assuming 'role' field holds the user role
+        setUserIsChef(data.role === "chef"); // Assuming 'role' field holds the user role
         setIsSubscribed(data.subscribers?.includes(currentUser.uid)); // Assuming 'subscribers' field holds an array of subscriber IDs
       }
     };
 
     fetchAdditionalUserData();
   }, [userId, currentUser.uid]);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const subscribeToUser = async () => {
+    try {
+      if (!currentUser) return;
+      const paymentResponse = await axios.post(
+        `http://192.168.100.115:8080/api/payments/intents`,
+        {
+          amount: 2000,
+        },
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-  // Function to handle subscribe/unsubscribe
-  const handleSubscription = async () => {
-    const profileRef = doc(db, 'users', userId);
-    const currentUserRef = doc(db, 'users', currentUser.uid);
+      console.log(paymentResponse);
 
-    if (isSubscribed) {
+      if (paymentResponse.status === 400) {
+        Alert.alert("Something went wrong");
+        return;
+      }
+      const initResponse = await initPaymentSheet({
+        merchantDisplayName: "CookEase",
+        paymentIntentClientSecret: paymentResponse.data.paymentIntent,
+      });
+
+      if (initResponse.error) {
+        Alert.alert("Something went wrong");
+        return;
+      }
+
+      const paymentSheetResponse = await presentPaymentSheet();
+      if (paymentSheetResponse.error) {
+        Alert.alert(
+          `Error code: ${paymentSheetResponse.error.code}`,
+          paymentSheetResponse.error.message
+        );
+        return;
+      }
+      const profileRef = doc(db, "users", userId);
+      const currentUserRef = doc(db, "users", currentUser.uid);
+
       await updateDoc(profileRef, {
-        subscribers: arrayRemove(currentUser.uid)
+        subscribers: arrayUnion(currentUser.uid),
       });
       await updateDoc(currentUserRef, {
-        subscribedTo: arrayRemove(userId)
-      });
-      setIsSubscribed(false);
-    } else {
-      await updateDoc(profileRef, {
-        subscribers: arrayUnion(currentUser.uid)
-      });
-      await updateDoc(currentUserRef, {
-        subscribedTo: arrayUnion(userId)
+        subscribedTo: arrayUnion(userId),
       });
       setIsSubscribed(true);
+    } catch (error) {
+      console.log(error.message);
     }
+  };
+
+  // New function to handle unsubscription
+  const unsubscribeFromUser = async () => {
+    if (!currentUser) return;
+    const profileRef = doc(db, "users", userId);
+    const currentUserRef = doc(db, "users", currentUser.uid);
+
+    await updateDoc(profileRef, {
+      subscribers: arrayRemove(currentUser.uid),
+    });
+    await updateDoc(currentUserRef, {
+      subscribedTo: arrayRemove(userId),
+    });
+    setIsSubscribed(false);
   };
 
   const handlePlaylistPress = () => {
     if (isSubscribed) {
       // User is subscribed, navigate to the Playlist screen with the userId parameter
-      navigation.navigate('otherplaylist', { userId: userId });
+      navigation.navigate("otherplaylist", { userId: userId });
     } else {
       // User is not subscribed, show an alert
       Alert.alert(
@@ -165,29 +241,42 @@ const OtherUserProfile = ({ route, navigation }) => {
       );
     }
   };
-  
-
 
   return (
     <View contentContainerStyle={styles.container}>
       {/* Back Icon */}
-      <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={() => navigation.goBack()}
+      >
         <Icon name="arrow-back" size={30} color="#000" />
       </TouchableOpacity>
       <Text style={styles.userName}>{userProfile.name}</Text>
-      <Button title={isFollowing ? 'Unfollow' : 'Follow'} onPress={handleFollow} />
-      <Text style={styles.followers}>Followers: {userProfile.followers.length}</Text>
-      <Text style={styles.followers}>Following: {userProfile.following.length}</Text>
+      <Button
+        title={isFollowing ? "Unfollow" : "Follow"}
+        onPress={handleFollow}
+      />
+      <Text style={styles.followers}>
+        Followers: {userProfile.followers.length}
+      </Text>
+      <Text style={styles.followers}>
+        Following: {userProfile.following.length}
+      </Text>
       {userIsChef && (
         <View>
-          <Button
-            title={isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-            onPress={handleSubscription}
-          />
-          <Button
-            title="Playlist"
-            onPress={handlePlaylistPress}
-          />
+          {!isSubscribed ? (
+            <TouchableOpacity onPress={subscribeToUser} style={styles.button}>
+              <Text>Subscribe</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={unsubscribeFromUser}
+              style={styles.button}
+            >
+              <Text>Unsubscribe</Text>
+            </TouchableOpacity>
+          )}
+          <Button title="Playlist" onPress={handlePlaylistPress} />
         </View>
       )}
       {/* <Text style={styles.followers}>Followers: {userProfile.followers?.length || 0}</Text> */}
@@ -206,26 +295,29 @@ const OtherUserProfile = ({ route, navigation }) => {
             data={userPosts}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => navigation.navigate('postdetail', { post: item })}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("postdetail", { post: item })
+                }
+              >
                 {/* <Image source={{ uri: item.image }} style={styles.image} /> */}
-                {
-                  item.image && (item.image.endsWith('.mp4') || item.image.endsWith('.mov')) ? (
-                    <Video
-                      source={{ uri: item.image }}
-                      style={styles.image}
-                      useNativeControls
-                      resizeMode="contain"
+                {item.image &&
+                (item.image.endsWith(".mp4") || item.image.endsWith(".mov")) ? (
+                  <Video
+                    source={{ uri: item.image }}
+                    style={styles.image}
+                    useNativeControls
+                    resizeMode="contain"
                     // shouldPlay // Auto-play the video
                     // isLooping // Loop the video
                     // onError={(e) => console.error("Error loading video", e)}
 
                     // onLoadStart={() => setIsLoading(true)}
                     // onLoad={() => setIsLoading(false)}
-                    />
-                  ) : (
-                    <Image source={{ uri: item.image }} style={styles.image} />
-                  )
-                }
+                  />
+                ) : (
+                  <Image source={{ uri: item.image }} style={styles.image} />
+                )}
               </TouchableOpacity>
             )}
             numColumns={3} // Display images in a grid format
@@ -234,25 +326,24 @@ const OtherUserProfile = ({ route, navigation }) => {
           <Text>No posts found</Text>
         )}
       </View>
-
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 20,
   },
   backIcon: {
-    position: 'fixed',
+    position: "fixed",
     top: 35, // Adjust top and left as per the design requirements
     left: 10,
     zIndex: 10, // Make sure the touchable opacity appears above other elements
   },
   userName: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
     marginTop: 40,
   },
@@ -262,7 +353,7 @@ const styles = StyleSheet.create({
   },
   postsHeader: {
     fontSize: 20,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginVertical: 10,
   },
   image: {
@@ -274,6 +365,15 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 2,
+  },
+  button: {
+    backgroundColor: "#4CAF50",
+    width: "80%",
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 10,
+    marginBottom: "7%",
+    marginTop: 17,
   },
 });
 
