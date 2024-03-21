@@ -13,7 +13,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const Home = ({ navigation }) => {
+const Payment = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -102,21 +102,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   searchInput: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "90%",
-    borderColor: "white",
+    fontSize: 18,
     borderWidth: 1,
+    borderColor: "#ddd",
     padding: 10,
-    marginLeft: "5%",
-    marginBottom: 15,
-    borderRadius: 10,
-    backgroundColor: "white",
-    shadowColor: "black",
-    shadowOffset: { width: 1, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    margin: 10,
+    borderRadius: 6,
   },
   recipeItem: {
     padding: 10,
@@ -157,4 +148,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default Payment;

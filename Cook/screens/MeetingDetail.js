@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform, ScrollView } from 'react-native';
-import { db } from '../firebase'; // Adjust this import according to your file structure
-import { collection, addDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Platform,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
+import { db } from "../firebase"; // Adjust this import according to your file structure
+import { collection, addDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import Icon from "react-native-vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 
 const MeetingDetail = ({ navigation }) => {
-  const [meetingName, setMeetingName] = useState('');
+  const [meetingName, setMeetingName] = useState("");
   const [meetingDate, setMeetingDate] = useState(new Date());
-  const [meetingTime, setMeetingTime] = useState('');
-  const [meetingLink, setMeetingLink] = useState('');
+  const [meetingTime, setMeetingTime] = useState("");
+  const [meetingLink, setMeetingLink] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const auth = getAuth();
   const currentUser = auth.currentUser;
@@ -39,124 +50,141 @@ const MeetingDetail = ({ navigation }) => {
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || meetingDate;
-    setShowDatePicker(Platform.OS === 'ios');
+    setShowDatePicker(Platform.OS === "ios");
     setMeetingDate(currentDate);
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-              {/* Back Icon */}
-      <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-back" size={30} color="#000" />
-      </TouchableOpacity>
-      <Text style={styles.headerText}>Enter Meeting Details</Text>
+    <SafeAreaView>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Back Icon */}
+        <TouchableOpacity
+          style={styles.backIcon}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={30} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Enter Meeting Details</Text>
 
-      <Text style={styles.label}>Meeting Name:</Text>
-      <TextInput
-        style={styles.input}
-        value={meetingName}
-        onChangeText={setMeetingName}
-        placeholder="e.g., Weekly Stand-up"
-      />
-
-      <Text style={styles.label}>Meeting Date:</Text>
-      <TouchableOpacity
-        style={styles.input}
-        onPress={() => setShowDatePicker(true)}>
-        <Text style={styles.inputText}>{meetingDate.toDateString()}</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={meetingDate}
-          mode={'date'}
-          is24Hour={true}
-          display="default"
-          onChange={onChangeDate}
+        <Text style={styles.label}>Meeting Name:</Text>
+        <TextInput
+          style={styles.input}
+          value={meetingName}
+          onChangeText={setMeetingName}
+          placeholder="e.g., Weekly Stand-up"
         />
-      )}
 
-      <Text style={styles.label}>Meeting Time:</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={meetingTime}
-          style={styles.picker}
-          onValueChange={(itemValue, itemIndex) => setMeetingTime(itemValue)}
-          mode="dropdown">
-          {Array.from({ length: 24 }, (_, i) => (
-            <Picker.Item key={i} label={`${i}:00`} value={`${i}:00`} />
-          ))}
-        </Picker>
-      </View>
+        <Text style={styles.label}>Meeting Date:</Text>
+        <TouchableOpacity
+          style={styles.input}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text style={styles.inputText}>{meetingDate.toDateString()}</Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={meetingDate}
+            mode={"date"}
+            is24Hour={true}
+            display="default"
+            onChange={onChangeDate}
+          />
+        )}
 
-            {/* Meeting Link */}
-            <Text style={styles.label}>Meeting Link:</Text>
-      <TextInput
-        style={styles.input}
-        value={meetingLink}
-        onChangeText={setMeetingLink}
-        placeholder="https://"
-      />
+        <Text style={styles.label}>Meeting Time:</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={meetingTime}
+            style={styles.picker}
+            onValueChange={(itemValue, itemIndex) => setMeetingTime(itemValue)}
+            mode="dropdown"
+          >
+            {Array.from({ length: 24 }, (_, i) => (
+              <Picker.Item key={i} label={`${i}:00`} value={`${i}:00`} />
+            ))}
+          </Picker>
+        </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleSaveMeetingDetails}>
-        <Text style={styles.buttonText}>Save Meeting Details</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        {/* Meeting Link */}
+        <Text style={styles.label}>Meeting Link:</Text>
+        <TextInput
+          style={styles.input}
+          value={meetingLink}
+          onChangeText={setMeetingLink}
+          placeholder="https://"
+        />
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSaveMeetingDetails}
+        >
+          <Text style={styles.buttonText}>Save Meeting Details</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'stretch',
+    justifyContent: "center",
+    alignItems: "stretch",
     padding: 20,
   },
   headerText: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   label: {
     fontSize: 16,
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   input: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    borderColor: "white",
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 15,
-    marginBottom: 20,
-    fontSize: 16,
-    backgroundColor: '#fff',
+    padding: 10,
+    marginBottom: 15,
+    borderRadius: 10,
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   inputText: {
     fontSize: 16,
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   picker: {
-    width: '100%',
+    width: "100%",
   },
   button: {
-    backgroundColor: '#4F8EF7',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
+    backgroundColor: "#4CAF50",
+    width: "100%",
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 10,
+    marginBottom: "7%",
+    marginTop: 5,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

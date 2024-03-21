@@ -174,14 +174,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
-    height: 50, // Increase the height for better touch area
-    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    borderColor: "white",
     borderWidth: 1,
-    borderColor: "#CCCCCC", // Softer border color
-    borderRadius: 25, // Rounder corners
-    padding: 15,
-    fontSize: 16, // Slightly larger font size
-    backgroundColor: "#F5F5F5", // Light grey background for the input field
+    padding: 10,
+    marginBottom: 15,
+    borderRadius: 10,
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   recipeItem: {
     padding: 15, // Increased padding for more space inside the boxes

@@ -215,7 +215,6 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: "#4CAF50",
-
     padding: 10,
     alignItems: "center",
     borderRadius: 10,
@@ -233,6 +232,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: "7%",
     marginTop: 10,
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 

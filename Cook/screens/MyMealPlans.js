@@ -142,7 +142,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "black",
-    marginBottom: 20,
     textAlign: "center",
   },
   mealPlanItem: {
@@ -186,6 +185,10 @@ const styles = StyleSheet.create({
     //paddingBottom: 40,
     marginBottom: 20,
     borderRadius: 10,
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   createButtonText: {
     color: "white",
@@ -205,8 +208,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#4CAF50",
     paddingVertical: 8,
     paddingHorizontal: 12,
+    marginTop: "0.5%",
     borderRadius: 5,
     borderRadius: 10,
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   generateListButtonText: {
     color: "#FFFFFF",
