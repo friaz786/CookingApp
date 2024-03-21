@@ -90,9 +90,8 @@ const HealthForm = ({ navigation }) => {
       <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
-            <Text style={styles.label}>Birthday:</Text>
             <Button
-              title="Choose Date"
+              title="Enter your Birthday"
               onPress={() => setShowDatePicker(true)}
               color="#007AFF"
             />
@@ -127,7 +126,7 @@ const HealthForm = ({ navigation }) => {
               onChangeText={setWeight}
             />
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Has Diabetes?</Text>
+              <Text style={styles.label}>Do you have Diabetes?</Text>
               <Switch
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
                 thumbColor={hasDiabetes ? "#007AFF" : "#f4f3f4"}
@@ -137,7 +136,7 @@ const HealthForm = ({ navigation }) => {
               />
             </View>
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Has Blood Pressure?</Text>
+              <Text style={styles.label}>Do you have High Blood Pressure?</Text>
               <Switch
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
                 thumbColor={hasBloodPressure ? "#007AFF" : "#f4f3f4"}
@@ -173,23 +172,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 20,
-    backgroundColor: "#F5F5F5", // A light grey background color for contrast
+    backgroundColor: "#ffe6e6", // A light grey background color for contrast
   },
   label: {
     fontSize: 16,
     fontWeight: "600",
     color: "#212121",
     marginBottom: 8,
+    marginTop: 10,
   },
   input: {
-    height: 50,
-    marginVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    width: "90%",
+    borderColor: "white",
     borderWidth: 1,
-    borderColor: "#E0E0E0", // A light grey border color for inputs
-    borderRadius: 10, // Rounded corners for inputs
-    padding: 15,
-    backgroundColor: "#FFFFFF", // White background for inputs
-    fontSize: 16,
+    padding: 10,
+    marginBottom: 15,
+    borderRadius: 10,
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   switchContainer: {
     flexDirection: "row",
@@ -198,7 +203,13 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   buttonContainer: {
-    marginTop: 20,
+    backgroundColor: "#4CAF50",
+    width: "80%",
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 10,
+    marginBottom: "7%",
+    marginTop: 17,
   },
   bmiText: {
     marginTop: 20,

@@ -40,260 +40,264 @@ import EventCalendar from "./screens/EventCalendar";
 import AddRecipeForEvent from "./screens/AddRecipeForEvent";
 import EventSearch from "./screens/EventSearch";
 import EventDetails from "./screens/EventDetails";
-//import RecipeDetail from './RecipeDetail';
+import { StripeProvider } from "@stripe/stripe-react-native";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const stripe_key =
+    "pk_test_51OwjelIu1YXMSFeydq78Yp3opOgqM2d4yVYslwXmonbmemxNUkWrugcJth9I8ACMm6tGhSptOkJyeamy6DIddFMT00zQqpuoBh";
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="login">
-        <Stack.Screen
-          name="login"
-          component={Login}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="signup"
-          component={Signup}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="navigation"
-          component={DrawerNavigation}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="forgotpassword"
-          component={ForgotPassword}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="profile"
-          component={Profile}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="editprofile"
-          component={EditProfile}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="scanner"
-          component={Scanner}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="calendar"
-          component={CalendarScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="createmealplan"
-          component={CreateMealPlan}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="searchrecipe"
-          component={SearchRecipe}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="healthform"
-          component={HealthForm}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="add"
-          component={Add}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="save"
-          component={Save}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="fetch"
-          component={Fetch}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="otheruserprofile"
-          component={OtherUserProfile}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="postdetail"
-          component={PostDetail}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="editpost"
-          component={EditPost}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="playlist"
-          component={Playlist}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="reels"
-          component={Reels}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="saveplaylist"
-          component={SavePlaylist}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="otherplaylist"
-          component={OtherPlaylist}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="playlistdetail"
-          component={PlaylistDetail}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="editvideo"
-          component={EditVideo}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="meeting"
-          component={Meeting}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="meetingdetail"
-          component={MeetingDetail}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="AddMeal"
-          component={AddMeal}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="MyMealPlans"
-          component={MyMealPlans}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="MealDetail"
-          component={MealDetail}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="GroceryList"
-          component={GroceryList}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="MyGrocery"
-          component={MyGrocery}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="MyEventPlans"
-          component={MyEventPlans}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="EventCalendar"
-          component={EventCalendar}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="AddRecipeForEvent"
-          component={AddRecipeForEvent}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="EventSearch"
-          component={EventSearch}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="EventDetails"
-          component={EventDetails}
-          options={{
-            headerShown: false,
-          }}
-        />
-      </Stack.Navigator>
+      <StripeProvider publishableKey={stripe_key}>
+        <Stack.Navigator initialRouteName="login">
+          <Stack.Screen
+            name="login"
+            component={Login}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="signup"
+            component={Signup}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="navigation"
+            component={DrawerNavigation}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="forgotpassword"
+            component={ForgotPassword}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="profile"
+            component={Profile}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="editprofile"
+            component={EditProfile}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="scanner"
+            component={Scanner}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="calendar"
+            component={CalendarScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="createmealplan"
+            component={CreateMealPlan}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="searchrecipe"
+            component={SearchRecipe}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="healthform"
+            component={HealthForm}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="add"
+            component={Add}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="save"
+            component={Save}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="fetch"
+            component={Fetch}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="otheruserprofile"
+            component={OtherUserProfile}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="postdetail"
+            component={PostDetail}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="editpost"
+            component={EditPost}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="playlist"
+            component={Playlist}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="reels"
+            component={Reels}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="saveplaylist"
+            component={SavePlaylist}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="otherplaylist"
+            component={OtherPlaylist}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="playlistdetail"
+            component={PlaylistDetail}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="editvideo"
+            component={EditVideo}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="meeting"
+            component={Meeting}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="meetingdetail"
+            component={MeetingDetail}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="AddMeal"
+            component={AddMeal}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="MyMealPlans"
+            component={MyMealPlans}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="MealDetail"
+            component={MealDetail}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="GroceryList"
+            component={GroceryList}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="MyGrocery"
+            component={MyGrocery}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="MyEventPlans"
+            component={MyEventPlans}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="EventCalendar"
+            component={EventCalendar}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="AddRecipeForEvent"
+            component={AddRecipeForEvent}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="EventSearch"
+            component={EventSearch}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="EventDetails"
+            component={EventDetails}
+            options={{
+              headerShown: false,
+            }}
+          />
+        </Stack.Navigator>
+      </StripeProvider>
     </NavigationContainer>
   );
 }

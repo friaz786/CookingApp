@@ -12,6 +12,7 @@ import Feed from "./Feed";
 import MyEventPlans from "./MyEventPlans";
 
 
+
 const Drawer = createDrawerNavigator();
 export default function DrawerNavigation(){
     return(<>
