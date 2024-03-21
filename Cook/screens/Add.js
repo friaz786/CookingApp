@@ -1,5 +1,3 @@
-//This page is for clicking or selecting picture to upload
-
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import { Camera } from "expo-camera";
@@ -9,6 +7,7 @@ import { MaterialIcons, FontAwesome, AntDesign } from "@expo/vector-icons";
 import styles from "./styles";
 //import Video from 'react-native-video';
 import { Video } from "expo-av";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Add({ navigation }) {
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
@@ -46,7 +45,6 @@ export default function Add({ navigation }) {
       setIsRecording(false);
     }
   };
-
 
   const takePicture = async () => {
     if (camera) {
@@ -98,18 +96,48 @@ export default function Add({ navigation }) {
   }
   return (
     <View style={styles.container}>
-
-      {/* old */}
-      {/* <View style={styles.Camcontainer}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="chevron-back" size={30} color="#000" />
+      </TouchableOpacity>
+      {/* new */}
+      <View style={styles.Camcontainer}>
         {!image ? (
           <Camera
             flashMode={flesh}
             ref={(ref) => setCamera(ref)}
             style={styles.preview}
             type={type}
-            autofocus={Camera.Constants.AutoFocus.on}
+            autoFocus={Camera.Constants.AutoFocus.on}
             ratio={"4:3"}
           />
+        ) : image.endsWith(".mov") || image.endsWith(".mp4") ? (
+          <View style={styles.containerVid}>
+            <Video
+              source={{ uri: image }}
+              style={{ flex: 1, aspectRatio: 3 / 4 }}
+              controls={true}
+              resizeMode="contain"
+            />
+            <IconButton
+              icon="close"
+              color="#fff"
+              onPress={() => setImage("")}
+              size={30}
+              style={{
+                position: "absolute",
+                right: 5,
+                top: 5,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.8,
+                shadowRadius: 8,
+                elevation: 15,
+              }}
+            />
+          </View>
         ) : (
           <View style={styles.containerImg}>
             <Image
@@ -131,100 +159,36 @@ export default function Add({ navigation }) {
                 shadowRadius: 8,
                 elevation: 15,
               }}
-            >
-              Clear screen
-            </IconButton>
+            />
           </View>
         )}
-      </View> */}
-
-      {/* new */}
-      <View style={styles.Camcontainer}>
-  {!image ? (
-    <Camera
-      flashMode={flesh}
-      ref={(ref) => setCamera(ref)}
-      style={styles.preview}
-      type={type}
-      autoFocus={Camera.Constants.AutoFocus.on}
-      ratio={"4:3"}
-    />
-  ) : image.endsWith('.mov') || image.endsWith('.mp4') ? (
-    <View style={styles.containerVid}>
-      <Video
-        source={{ uri: image }}
-        style={{ flex: 1, aspectRatio: 3 / 4 }}
-        controls={true}
-        resizeMode="contain"
-      />
-      <IconButton
-              icon="close"
-              color="#fff"
-              onPress={() => setImage("")}
-              size={30}
-              style={{
-                position: "absolute",
-                right: 5,
-                top: 5,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.8,
-                shadowRadius: 8,
-                elevation: 15,
-              }}
-      />
-    </View>
-  ) : (
-    <View style={styles.containerImg}>
-      <Image
-        source={{ uri: image }}
-        style={{ flex: 1, aspectRatio: 3 / 4 }}
-      />
-      <IconButton
-              icon="close"
-              color="#fff"
-              onPress={() => setImage("")}
-              size={30}
-              style={{
-                position: "absolute",
-                right: 5,
-                top: 5,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.8,
-                shadowRadius: 8,
-                elevation: 15,
-              }}
-      />
-    </View>
-  )}
-</View>
-{/* end */}
+      </View>
+      {/* end */}
       <View style={styles.picContainer}>
-      {!isRecording && !image ? (
-        <TouchableOpacity onPress={takePicture}>
-          <FontAwesome
-            name="circle-o"
-            color={"#3a3a3a"}
-            size={80}
-            style={styles.button1}
-          />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("save", { image });
-          }}
-        >
-          <AntDesign
-            name="checkcircle"
-            color={"#000"}
-            size={65}
-            style={styles.button1}
-          />
-        </TouchableOpacity>
-      )}
-              {!isRecording ? (
+        {!isRecording && !image ? (
+          <TouchableOpacity onPress={takePicture}>
+            <FontAwesome
+              name="circle-o"
+              color={"#3a3a3a"}
+              size={80}
+              style={styles.button1}
+            />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("save", { image });
+            }}
+          >
+            <AntDesign
+              name="checkcircle"
+              color={"#000"}
+              size={65}
+              style={styles.button1}
+            />
+          </TouchableOpacity>
+        )}
+        {!isRecording ? (
           <TouchableOpacity onPress={startRecording}>
             <FontAwesome name="video-camera" size={50} color="red" />
           </TouchableOpacity>
@@ -233,9 +197,7 @@ export default function Add({ navigation }) {
             <FontAwesome name="stop-circle" size={50} color="blue" />
           </TouchableOpacity>
         )}
-        </View>
-
-
+      </View>
 
       <View style={styles.buttonContainer}>
         <IconButton size={30} icon="image" onPress={pickImage} />

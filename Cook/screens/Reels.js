@@ -47,7 +47,6 @@ export default function Add({ navigation }) {
     }
   };
 
-
   const takePicture = async () => {
     if (camera) {
       const data = await camera.takePictureAsync(null);
@@ -98,7 +97,6 @@ export default function Add({ navigation }) {
   }
   return (
     <View style={styles.container}>
-
       {/* old */}
       {/* <View style={styles.Camcontainer}>
         {!image ? (
@@ -140,24 +138,24 @@ export default function Add({ navigation }) {
 
       {/* new */}
       <View style={styles.Camcontainer}>
-  {!image ? (
-    <Camera
-      flashMode={flesh}
-      ref={(ref) => setCamera(ref)}
-      style={styles.preview}
-      type={type}
-      autoFocus={Camera.Constants.AutoFocus.on}
-      ratio={"4:3"}
-    />
-  ) : image.endsWith('.mov') || image.endsWith('.mp4') ? (
-    <View style={styles.containerVid}>
-      <Video
-        source={{ uri: image }}
-        style={{ flex: 1, aspectRatio: 3 / 4 }}
-        controls={true}
-        resizeMode="contain"
-      />
-      <IconButton
+        {!image ? (
+          <Camera
+            flashMode={flesh}
+            ref={(ref) => setCamera(ref)}
+            style={styles.preview}
+            type={type}
+            autoFocus={Camera.Constants.AutoFocus.on}
+            ratio={"4:3"}
+          />
+        ) : image.endsWith(".mov") || image.endsWith(".mp4") ? (
+          <View style={styles.containerVid}>
+            <Video
+              source={{ uri: image }}
+              style={{ flex: 1, aspectRatio: 3 / 4 }}
+              controls={true}
+              resizeMode="contain"
+            />
+            <IconButton
               icon="close"
               color="#fff"
               onPress={() => setImage("")}
@@ -172,15 +170,15 @@ export default function Add({ navigation }) {
                 shadowRadius: 8,
                 elevation: 15,
               }}
-      />
-    </View>
-  ) : (
-    <View style={styles.containerImg}>
-      <Image
-        source={{ uri: image }}
-        style={{ flex: 1, aspectRatio: 3 / 4 }}
-      />
-      <IconButton
+            />
+          </View>
+        ) : (
+          <View style={styles.containerImg}>
+            <Image
+              source={{ uri: image }}
+              style={{ flex: 1, aspectRatio: 3 / 4 }}
+            />
+            <IconButton
               icon="close"
               color="#fff"
               onPress={() => setImage("")}
@@ -195,36 +193,36 @@ export default function Add({ navigation }) {
                 shadowRadius: 8,
                 elevation: 15,
               }}
-      />
-    </View>
-  )}
-</View>
-{/* end */}
+            />
+          </View>
+        )}
+      </View>
+      {/* end */}
       <View style={styles.picContainer}>
-      {!isRecording && !image ? (
-        <TouchableOpacity >
-          <FontAwesome
-            name="circle-o"
-            color={"#3a3a3a"}
-            size={80}
-            style={styles.button1}
-          />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("saveplaylist", { image });
-          }}
-        >
-          <AntDesign
-            name="checkcircle"
-            color={"#000"}
-            size={65}
-            style={styles.button1}
-          />
-        </TouchableOpacity>
-      )}
-              {!isRecording ? (
+        {!isRecording && !image ? (
+          <TouchableOpacity>
+            <FontAwesome
+              name="circle-o"
+              color={"#3a3a3a"}
+              size={80}
+              style={styles.button1}
+            />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("saveplaylist", { image });
+            }}
+          >
+            <AntDesign
+              name="checkcircle"
+              color={"#000"}
+              size={65}
+              style={styles.button1}
+            />
+          </TouchableOpacity>
+        )}
+        {!isRecording ? (
           <TouchableOpacity onPress={startRecording}>
             <FontAwesome name="video-camera" size={50} color="red" />
           </TouchableOpacity>
@@ -233,9 +231,7 @@ export default function Add({ navigation }) {
             <FontAwesome name="stop-circle" size={50} color="blue" />
           </TouchableOpacity>
         )}
-        </View>
-
-
+      </View>
 
       <View style={styles.buttonContainer}>
         <IconButton size={30} icon="image" onPress={pickImage} />

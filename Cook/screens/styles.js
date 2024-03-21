@@ -9,6 +9,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "white",
   },
+  backIcon: {
+    position: "absolute",
+    top: 45,
+    left: 10,
+    zIndex: 10,
+    colour: "white",
+  },
   containerImg: {
     flex: 1,
   },
@@ -137,7 +144,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
-  picContainer:{
+  picContainer: {
     padding: 13,
     paddingHorizontal: 40,
     marginHorizontal: 40,
@@ -148,12 +155,10 @@ const styles = StyleSheet.create({
   containerVid: {
     flex: 1,
     resizeMode: "contain",
-    height: '75%',
+    height: "75%",
     alignItems: "center",
     justifyContent: "center",
-
   },
-
 });
 
 export default styles;
