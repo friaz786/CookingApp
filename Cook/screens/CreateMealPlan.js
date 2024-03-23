@@ -56,7 +56,10 @@ export default function CreateMealPlan({ navigation, route }) {
         <Text style={styles.mealHeaderText}>Dinner</Text>
       </View>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("MyMealPlans")}
+      >
         <Text style={styles.buttonText}>Complete Meal Plan</Text>
       </TouchableOpacity>
     </SafeAreaView>

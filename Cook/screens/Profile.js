@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
   Alert,
 } from "react-native";
 import { db } from "../firebase"; // Your Firebase configuration file
@@ -20,6 +21,8 @@ import {
   getDoc,
   updateDoc,
   getFirestore,
+  orderBy,
+  deleteDoc,
 } from "firebase/firestore";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useFocusEffect } from "@react-navigation/native";
@@ -27,6 +30,12 @@ import { Video } from "expo-av";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 import * as ImagePicker from "expo-image-picker";
+import {
+  FontAwesome5,
+  MaterialCommunityIcons,
+  Feather,
+  MaterialIcons,
+} from "@expo/vector-icons";
 
 const Profile = ({ navigation }) => {
   const [userName, setUserName] = useState({ name: "Loading..." });
@@ -36,6 +45,8 @@ const Profile = ({ navigation }) => {
   const [isChef, setIsChef] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [userProfilePic, setUserProfilePic] = useState(null);
+  const [userBlogs, setUserBlogs] = useState([]);
+  const [currentView, setCurrentView] = useState("posts"); // "posts" or "blogs"
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -130,7 +141,8 @@ const Profile = ({ navigation }) => {
       // Assuming you have a 'posts' collection with a 'userID' field linking to the user's UID
       const postsRef = query(
         collection(db, "posts"),
-        where("userID", "==", user.uid)
+        where("userID", "==", user.uid),
+        orderBy("createdAt", "desc")
       );
       const postsSnap = await getDocs(postsRef);
       const fetchedPosts = [];
@@ -148,11 +160,54 @@ const Profile = ({ navigation }) => {
     fetchUserData();
   }, [userPosts]);
 
+  useEffect(() => {
+    const fetchUserBlogs = async () => {
+      if (user) {
+        const blogsRef = query(
+          collection(db, "blogs"),
+          where("userId", "==", user.uid)
+          //orderBy("createdAt", "desc") // Assuming you have a 'createdAt' field for sorting
+        );
+        const blogsSnap = await getDocs(blogsRef);
+        const fetchedBlogs = [];
+        blogsSnap.forEach((doc) => {
+          fetchedBlogs.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+        setUserBlogs(fetchedBlogs);
+      }
+    };
+
+    fetchUserBlogs();
+  }, [user, userBlogs]);
+
+  const deleteBlog = async (blogId) => {
+    // Show confirmation alert before deleting
+    Alert.alert("Delete Blog", "Are you sure you want to delete this blog?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: async () => {
+          try {
+            await deleteDoc(doc(db, "blogs", blogId));
+            // Optionally, refresh the list or show a confirmation message
+            Alert.alert("Blog deleted successfully");
+          } catch (error) {
+            console.error("Error deleting blog:", error);
+            Alert.alert("Error deleting blog");
+          }
+        },
+      },
+    ]);
+  };
   return (
-    <View style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.header}>
-        {/* Profile Photo */}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.profileSection}>
         <TouchableOpacity onPress={pickImage}>
           {userProfilePic ? (
             <Image source={{ uri: userProfilePic }} style={styles.profilePic} />
@@ -160,213 +215,276 @@ const Profile = ({ navigation }) => {
             <Icon name="person-circle-outline" size={100} color="#4F8EF7" />
           )}
         </TouchableOpacity>
-        <Text style={styles.userName}>{userName.name}</Text>
-        <Text style={styles.followersCount}>
-          Followers: {userProfile.followers?.length || 0}
-        </Text>
-        <Text style={styles.followersCount}>
-          Following: {userProfile.following?.length || 0}
-        </Text>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => navigation.navigate("editprofile")}
-        >
-          <Icon name="create-outline" size={24} color="#4F8EF7" />
-        </TouchableOpacity>
-      </View>
+        <Text style={styles.userName}>{userName.name || "User Name"}</Text>
 
-      {isChef && (
-        <View style={styles.buttonsContainer}>
+        {/* Counts Container positioned before the Button Container */}
+        <View style={styles.countsContainer}>
+          <View style={styles.countItem}>
+            <Text style={styles.countNumber}>
+              {userProfile.followers?.length || 0}
+            </Text>
+            <Text style={styles.countLabel}>Followers</Text>
+          </View>
+          {isChef && (
+            <View style={styles.countItem}>
+              <Text style={styles.countNumber}>
+                {userProfile.subscribers?.length || 0}
+              </Text>
+              <Text style={styles.countLabel}>Subscribers</Text>
+            </View>
+          )}
+          <View style={styles.countItem}>
+            <Text style={styles.countNumber}>
+              {userProfile.following?.length || 0}
+            </Text>
+            <Text style={styles.countLabel}>Following</Text>
+          </View>
+        </View>
+
+        {/* Button Container */}
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() =>
-              navigation.navigate("playlist", { userId: user.uid })
-            }
+            onPress={() => navigation.navigate("editprofile")}
           >
-            <Text style={styles.buttonText}>Playlist</Text>
+            <Text style={styles.text}>Edit Profile</Text>
           </TouchableOpacity>
-        </View>
-      )}
 
-      {/* Upload Button */}
-      <TouchableOpacity
-        style={styles.uploadButton}
-        onPress={() => navigation.navigate("add")}
-      >
-        <Text style={styles.uploadButtonText}>Add photo</Text>
-      </TouchableOpacity>
-
-      <View style={styles.container1}>
-        {/* {userPosts.length > 0 ? (
-        <FlatList
-          data={userPosts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Image source={{ uri: item.image }} style={styles.image} />
-          )}
-          numColumns={3} // Display images in a grid format
-        />
-      ) : (
-        <Text>No posts found</Text>
-      )} */}
-
-        <FlatList
-          data={userPosts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+          {isChef && (
             <TouchableOpacity
-              onPress={() => navigation.navigate("postdetail", { post: item })}
+              style={styles.button}
+              onPress={() =>
+                navigation.navigate("playlist", { userId: user.uid })
+              }
             >
-              {/* <Image source={{ uri: item.image }} style={styles.image} /> */}
-              {item.image &&
-              (item.image.endsWith(".mp4") || item.image.endsWith(".mov")) ? (
-                <Video
-                  source={{ uri: item.image }}
-                  style={styles.image}
-                  useNativeControls
-                  resizeMode="contain"
-                  // shouldPlay // Auto-play the video
-                  // isLooping // Loop the video
-                  // onError={(e) => console.error("Error loading video", e)}
-
-                  // onLoadStart={() => setIsLoading(true)}
-                  // onLoad={() => setIsLoading(false)}
-                />
-              ) : (
-                <Image source={{ uri: item.image }} style={styles.image} />
-              )}
+              <Text style={styles.text}>My Playlist</Text>
             </TouchableOpacity>
           )}
-          numColumns={3}
-        />
+
+          {currentView === "posts" && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("add")}
+            >
+              <Text style={styles.text}>Upload Post</Text>
+            </TouchableOpacity>
+          )}
+
+          {currentView === "blogs" && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("uploadblog")}
+            >
+              <Text style={styles.text}>Upload Blog</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <View style={styles.bottomBar}>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={() => navigation.navigate("home")}
+          onPress={() => setCurrentView("posts")}
         >
-          <Icon name="home-outline" size={30} color="#4F8EF7" />
+          <MaterialCommunityIcons name="grid" size={30} color="#4CAF50" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={() => navigation.navigate("scanner")}
+          onPress={() => setCurrentView("blogs")}
         >
-          <Icon name="scan-outline" size={30} color="#4F8EF7" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => navigation.navigate("profile")}
-        >
-          <Icon name="person-outline" size={30} color="#4F8EF7" />
+          <FontAwesome5 name="readme" size={30} color="#4CAF50" />
         </TouchableOpacity>
       </View>
-    </View>
+      <View style={styles.container1}>
+        <View style={styles.container1}>
+          {currentView === "posts" ? (
+            <FlatList
+              key={"posts-3-columns"} // Unique key for posts view
+              data={userPosts}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("postdetail", { post: item })
+                  }
+                  style={styles.postItem}
+                >
+                  {item.image &&
+                  (item.image.endsWith(".mp4") ||
+                    item.image.endsWith(".mov")) ? (
+                    <Video
+                      source={{ uri: item.image }}
+                      style={styles.image}
+                      useNativeControls
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <Image source={{ uri: item.image }} style={styles.image} />
+                  )}
+                </TouchableOpacity>
+              )}
+              numColumns={3}
+              contentContainerStyle={{ paddingHorizontal: 0 }}
+            />
+          ) : (
+            <FlatList
+              key={"blogs-1-column"} // Unique key for blogs view, assuming 1 column for blogs
+              data={userBlogs} // Replace with your state variable for blogs
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                // Adjust according to how you want to render each blog
+                <View style={styles.blogPostContainer}>
+                  <Text style={styles.blogTitle}>{item.title}</Text>
+                  <Text style={styles.blogText}>{item.text}</Text>
+                  <View style={styles.blogActions}>
+                    {/* <TouchableOpacity
+                  onPress={() => editBlog(item)}
+                  style={styles.blogActionButton}
+                >
+                  <Feather name="edit" size={24} color="black" />
+                </TouchableOpacity> */}
+                    <TouchableOpacity
+                      onPress={() => deleteBlog(item.id)}
+                      style={styles.blogActionButton}
+                    >
+                      <MaterialIcons
+                        name="delete-forever"
+                        size={24}
+                        color="red"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+              numColumns={1} // Assuming blogs are rendered in a single column
+            />
+          )}
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "white",
+  },
+  blogPostContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  blogTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  blogText: {
+    fontSize: 14,
+  },
+  blogActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 10,
+  },
+  blogActionButton: {
+    marginLeft: 10,
+  },
+  profileSection: {
+    alignItems: "center",
+    paddingTop: 20, // Adjust padding top for safe area
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#dbdbdb",
   },
   profilePic: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    alignSelf: "center",
-    marginTop: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderColor: "#e0e0e0",
+    width: 120,
+    height: 120,
+    borderRadius: 60, // Make it perfectly round
+    marginBottom: 10,
   },
   userName: {
     fontSize: 22,
     fontWeight: "bold",
+    color: "#262626",
+    marginBottom: 8,
   },
-  editButton: {
-    // Style as needed
-  },
-  uploadButton: {
-    backgroundColor: "#4F8EF7",
-    padding: 15,
-    margin: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  uploadButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  blogItem: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  photoContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  photo: {
-    width: "48%", // Two photos per row
-    height: 150,
-    marginBottom: 10,
-  },
-  bottomBar: {
+  countsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 10,
-    backgroundColor: "#fff",
-    borderTopWidth: 0,
-    borderColor: "#e0e0e0",
-    paddingTop: "5%",
-  },
-  container1: {
-    flex: 2,
     alignItems: "center",
-    marginTop: 20,
+    width: "100%",
+    marginBottom: 10, // Space between counters and buttons
   },
-  image: {
-    width: 100,
-    height: 100,
-    margin: 2,
-  },
-  buttonsContainer: {
-    flexDirection: "row",
+  countItem: {
+    alignItems: "center",
     justifyContent: "center",
-    padding: 10,
+  },
+  countNumber: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#262626",
+  },
+  countLabel: {
+    fontSize: 14,
+    color: "#8e8e8e",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 20, // Space below the buttons
   },
   button: {
-    backgroundColor: "#4F8EF7",
-    padding: 10,
+    backgroundColor: "#4CAF50",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#4CAF50",
+    flex: 1,
     marginHorizontal: 5,
-    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
     shadowColor: "black",
     shadowOffset: { width: 1, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-  buttonText: {
+  text: {
     color: "white",
   },
-  subscribedText: {
-    color: "green",
+  bottomBar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderColor: "#dbdbdb",
+    backgroundColor: "#fafafa",
+    marginTop: "-5%",
+  },
+
+  iconButton: {
+    alignItems: "center",
+  },
+  image: {
+    width: "33%",
+    aspectRatio: 1,
+    margin: 1,
+  },
+  container1: {
+    paddingHorizontal: 10, // Side padding for the whole container
+  },
+  postItem: {
+    flex: 1 / 3, // Divide the row into three equal parts
+    aspectRatio: 1, // Your images are square
+    padding: 2, // This will create a small space between items
+  },
+  image: {
+    flex: 1, // Make the image fill the entire space
+    margin: 1, // Margin to create spacing between images
+    // Remove aspectRatio here if you want the images to fill the space
   },
 });
 

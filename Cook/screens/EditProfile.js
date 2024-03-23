@@ -98,7 +98,7 @@ const EditProfile = ({ navigation }) => {
           secureTextEntry
         />
         <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
-          <Text>Update Password</Text>
+          <Text style={styles.passwordtext}>Update Password</Text>
         </TouchableOpacity>
 
         {/* Phone Input and Button */}
@@ -112,7 +112,7 @@ const EditProfile = ({ navigation }) => {
           style={styles.button}
           onPress={handleUpdatePhoneNumber}
         >
-          <Text>Update Phone</Text>
+          <Text style={styles.phonetext}>Update Phone</Text>
         </TouchableOpacity>
 
         {/* Name Input and Button */}
@@ -123,7 +123,7 @@ const EditProfile = ({ navigation }) => {
           value={name}
         />
         <TouchableOpacity style={styles.button} onPress={handleUpdateName}>
-          <Text>Update Name</Text>
+          <Text style={styles.nametext}>Update Name</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -177,11 +177,23 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 10,
     marginBottom: "17%",
-    marginTop: 17,
+    marginTop: "2%",
     shadowColor: "black",
     shadowOffset: { width: 1, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  passwordtext: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  phonetext: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  nametext: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

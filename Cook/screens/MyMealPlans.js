@@ -15,6 +15,8 @@ import {
   where,
   deleteDoc,
   doc,
+  getDocs,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { MaterialIcons } from "@expo/vector-icons";

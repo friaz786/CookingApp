@@ -18,6 +18,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import Icon from "react-native-vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 
 const SearchRecipe = ({ navigation, route }) => {
@@ -51,6 +52,7 @@ const SearchRecipe = ({ navigation, route }) => {
       try {
         // Query against the lowercase name
         const q = query(
+          //collection(db, "your_recipe"),
           collection(db, "recipes"),
           where("name", ">=", trimmedQuery),
           where("name", "<=", trimmedQuery + "\uf8ff")
@@ -144,8 +146,9 @@ const SearchRecipe = ({ navigation, route }) => {
         style={styles.backIcon}
         onPress={() => navigation.goBack()}
       >
-        <Icon name="arrow-back" size={30} color="#000" />
+        <Ionicons name="chevron-back" size={30} color="#000" />
       </TouchableOpacity>
+      <Text style={styles.header}>Search Recipes</Text>
 
       <TextInput
         style={styles.input}
@@ -170,8 +173,22 @@ const SearchRecipe = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: "center",
     backgroundColor: "#FFFFFF", // Use a light background for the whole screen
     padding: 20,
+  },
+  backIcon: {
+    position: "absolute",
+    top: 45, // Adjust top and left as per the design requirements
+    left: 10,
+    zIndex: 10,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: "5%",
+    marginTop: "10%",
   },
   input: {
     flexDirection: "row",
@@ -191,18 +208,20 @@ const styles = StyleSheet.create({
   recipeItem: {
     padding: 15, // Increased padding for more space inside the boxes
     marginTop: 10, // Add more space between items
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#ffe6e6",
     borderWidth: 1, // Removing border as the background color is enough contrast
-    borderRadius: 20, // More pronounced rounded corners
-    color: "white",
-    fontSize: 18, // Larger font size for readability
+    borderRadius: 20,
+    borderColor: "#ffe6e6", // More pronounced rounded corners
+    color: "black",
+    fontSize: 18,
+
     shadowColor: "#000", // Shadow for iOS
     shadowOffset: {
-      width: 0,
+      width: 10,
       height: 2,
     },
     shadowOpacity: 0.23,
-    shadowRadius: 2.62,
+    shadowRadius: 2.6,
     elevation: 4, // Elevation for Android
   },
   recipe: {

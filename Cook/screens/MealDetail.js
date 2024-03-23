@@ -1,21 +1,23 @@
 import React from "react";
-import Icon from "react-native-vector-icons/Ionicons";
 import {
+  ScrollView,
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
 } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 
 const MealPlanDetails = ({ route, navigation }) => {
   const { mealPlans, date } = route.params;
-  const mealOrder = ["Breakfast", "Lunch", "Dinner"];
-  const sortedMealPlans = mealPlans
-    .filter((plan) => mealOrder.includes(plan.mealType))
-    .sort(
-      (a, b) => mealOrder.indexOf(a.mealType) - mealOrder.indexOf(b.mealType)
-    );
+
+  const groupedMealPlans = mealPlans.reduce((acc, plan) => {
+    (acc[plan.mealType] = acc[plan.mealType] || []).push(plan);
+    return acc;
+  }, {});
+
+  const mealTypes = ["Breakfast", "Lunch", "Dinner"];
 
   return (
     <ScrollView style={styles.container}>
@@ -23,37 +25,25 @@ const MealPlanDetails = ({ route, navigation }) => {
         style={styles.backIcon}
         onPress={() => navigation.goBack()}
       >
-        <Icon name="arrow-back" size={30} color="#000" />
+        <Ionicons name="chevron-back" size={30} color="#000" />
       </TouchableOpacity>
-
-      {/* My Meal Plans Heading */}
       <Text style={styles.screenTitle}>My Meal Plans</Text>
-
       <Text style={styles.dateTitle}>Meal Plan for {date}</Text>
-      {sortedMealPlans.map((plan, index) => (
-        <View key={index} style={styles.mealPlanContainer}>
-          <Text style={styles.mealType}>{plan.mealType}</Text>
-          <Text style={styles.recipeTitle}>Recipe: {plan.recipe}</Text>
-          {plan.ingredients && (
-            <View style={styles.ingredientsContainer}>
-              <Text style={styles.sectionTitle}>Ingredients:</Text>
-              {plan.ingredients.map((ingredient, idx) => (
-                <Text key={idx} style={styles.ingredientText}>
-                  - {ingredient}
-                </Text>
-              ))}
-            </View>
-          )}
-          {plan.steps && (
-            <View style={styles.stepsContainer}>
-              <Text style={styles.sectionTitle}>Steps:</Text>
-              {plan.steps.map((step, idx) => (
-                <Text key={idx} style={styles.stepText}>
-                  {idx + 1}. {step}
-                </Text>
-              ))}
-            </View>
-          )}
+
+      {mealTypes.map((mealType) => (
+        <View key={mealType} style={styles.mealTypeContainer}>
+          <Text style={styles.mealTypeHeader}>{mealType}</Text>
+          {groupedMealPlans[mealType]?.map((plan, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => navigation.navigate("Recipe", { recipe: plan })}
+              style={styles.card}
+            >
+              <Text style={styles.cardText}>
+                {index + 1}. {plan.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       ))}
     </ScrollView>
@@ -64,14 +54,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    backgroundColor: "white",
   },
   backIcon: {
-    marginBottom: 10,
+    zIndex: 10,
+    marginTop: "5%",
   },
   screenTitle: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "#000",
+    color: "black",
     textAlign: "center",
     marginBottom: 20,
   },
@@ -80,42 +72,34 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+    color: "#4CAF50",
   },
-  mealPlanContainer: {
-    marginBottom: 30,
-    padding: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
+  mealTypeContainer: {
+    marginBottom: 10,
   },
-  mealType: {
+  mealTypeHeader: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: 15,
+    color: "black",
   },
-  recipeTitle: {
+  card: {
+    backgroundColor: "lightgrey", // Light grey background for the card
+    borderRadius: 8, // Rounded corners for the card
+    padding: 10, // Padding inside the card
+    marginBottom: 10, // Space between cards
+    shadowColor: "black", // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4, // Elevation for Android
+  },
+  cardText: {
     fontSize: 18,
-    fontStyle: "italic",
-    marginBottom: 5,
-  },
-  ingredientsContainer: {
-    marginTop: 5,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  ingredientText: {
-    fontSize: 16,
-    marginLeft: 10,
-  },
-  stepsContainer: {
-    marginTop: 10,
-  },
-  stepText: {
-    fontSize: 16,
-    marginLeft: 10,
-    marginBottom: 5,
+    color: "#000", // Dark text color for readability
   },
 });
 
