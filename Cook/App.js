@@ -40,7 +40,10 @@ import EventCalendar from "./screens/EventCalendar";
 import AddRecipeForEvent from "./screens/AddRecipeForEvent";
 import EventSearch from "./screens/EventSearch";
 import EventDetails from "./screens/EventDetails";
+import Recipe from "./screens/Recipe";
 import { StripeProvider } from "@stripe/stripe-react-native";
+import UploadBlog from "./screens/UploadBlog";
+import EventRecipe from "./screens/EventRecipe";
 
 const Stack = createNativeStackNavigator();
 
@@ -292,6 +295,28 @@ export default function App() {
           <Stack.Screen
             name="EventDetails"
             component={EventDetails}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="Recipe"
+            component={Recipe}
+            options={{
+              headerShown: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="uploadblog"
+            component={UploadBlog}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="EventRecipe"
+            component={EventRecipe}
             options={{
               headerShown: false,
             }}

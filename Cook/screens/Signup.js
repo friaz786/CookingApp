@@ -48,7 +48,7 @@ const Signup = ({ navigation }) => {
       const userData = {
         name: name,
         phoneNumber: phoneNumber,
-        userType: isChef ? "chef" : "normal-user",
+        role: isChef ? "chef" : "normal-user",
         cuisines: selectedCuisines, // This should be an array of selected cuisines
         followers: [], // Initialize followers as an empty array
         following: [],
@@ -188,8 +188,8 @@ const Signup = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "center", // This centers children horizontally in the container
+    justifyContent: "flex-start", // Adjusted to align children to start, useful for forms
     padding: 20,
     backgroundColor: "#ffe6e6",
   },
@@ -204,13 +204,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     marginBottom: 30,
+    marginTop: "10%",
   },
   input: {
-    flexDirection: "row",
-    alignItems: "center",
     width: "80%",
-    borderColor: "white",
-    borderWidth: 1,
     padding: 10,
     marginBottom: 20,
     borderRadius: 10,
@@ -219,6 +216,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 1, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    alignSelf: "center", // Ensure it centers itself in the parent
   },
   registerAsChefCheckbox: {
     flexDirection: "row",
@@ -270,13 +268,18 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   button: {
-    backgroundColor: "#4CAF50",
     width: "80%",
     padding: 10,
     alignItems: "center",
+    justifyContent: "center", // Ensure text within button is centered
     borderRadius: 10,
-    marginBottom: "7%",
-    marginTop: 17,
+    backgroundColor: "#4CAF50",
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    alignSelf: "center",
+    marginBottom: "2%",
   },
   buttonText: {
     color: "#ffffff",

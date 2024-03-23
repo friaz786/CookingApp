@@ -9,6 +9,9 @@ import {
   Alert,
   TouchableOpacity,
   SafeAreaView,
+  Keyboard,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { db } from "../firebase"; // Import your Firebase config
 import { collection, addDoc } from "firebase/firestore";
@@ -71,47 +74,53 @@ export default function Save({ route, navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>New Post</Text>
-      <TouchableOpacity
-        style={styles.backIcon}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons name="chevron-back" size={30} color="#000" />
-      </TouchableOpacity>
-      {image && (image.endsWith(".mp4") || image.endsWith(".mov")) ? (
-        <View style={styles.containerImg}>
-          <Video
-            source={{ uri: image }}
-            style={styles.image} // Adjust the style as needed
-            useNativeControls
-            resizeMode="contain"
-          />
-          {/* Optional: Add a close or back button here */}
-        </View>
-      ) : (
-        <Image source={{ uri: image }} style={styles.image} />
-      )}
+    <>
+      <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={true}>
+          <SafeAreaView style={styles.container}>
+            <Text style={styles.title}>New Post</Text>
+            <TouchableOpacity
+              style={styles.backIcon}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="chevron-back" size={30} color="#000" />
+            </TouchableOpacity>
+            {image && (image.endsWith(".mp4") || image.endsWith(".mov")) ? (
+              <View style={styles.containerImg}>
+                <Video
+                  source={{ uri: image }}
+                  style={styles.image} // Adjust the style as needed
+                  useNativeControls
+                  resizeMode="contain"
+                />
+                {/* Optional: Add a close or back button here */}
+              </View>
+            ) : (
+              <Image source={{ uri: image }} style={styles.image} />
+            )}
 
-      <TextInput
-        style={[styles.input, { height: "auto", maxHeight: 200 }]} // Adjust maxHeight as needed
-        placeholder="Write a caption..."
-        value={caption}
-        onChangeText={setCaption}
-        multiline={true}
-        // Optional: If you want to control the behavior on pressing enter, you can use the below prop
-        // onKeyPress={({ nativeEvent }) => {
-        //   if (nativeEvent.key === 'Enter') {
-        //     // Handle the enter press if needed
-        //   }
-        // }}
-      />
-      <TouchableOpacity onPress={handleSavePost} disabled={!userID}>
-        <View style={styles.uploadButton}>
-          <Text style={styles.uploadText}>Upload Photo</Text>
-        </View>
-      </TouchableOpacity>
-    </SafeAreaView>
+            <TextInput
+              style={[styles.input, { height: "auto", maxHeight: 200 }]} // Adjust maxHeight as needed
+              placeholder="Write a caption..."
+              value={caption}
+              onChangeText={setCaption}
+              multiline={true}
+              // Optional: If you want to control the behavior on pressing enter, you can use the below prop
+              // onKeyPress={({ nativeEvent }) => {
+              //   if (nativeEvent.key === 'Enter') {
+              //     // Handle the enter press if needed
+              //   }
+              // }}
+            />
+            <TouchableOpacity onPress={handleSavePost} disabled={!userID}>
+              <View style={styles.uploadButton}>
+                <Text style={styles.uploadText}>Upload Photo</Text>
+              </View>
+            </TouchableOpacity>
+          </SafeAreaView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </>
   );
 }
 

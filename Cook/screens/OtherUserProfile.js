@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  SafeAreaView,
   Alert,
 } from "react-native";
 import { db } from "../firebase"; // Adjust this import according to your file structure
@@ -18,6 +19,7 @@ import {
   arrayUnion,
   arrayRemove,
   collection,
+  orderBy,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -25,6 +27,7 @@ import { query, where, getDocs } from "firebase/firestore";
 import { Video } from "expo-av";
 import { useStripe } from "@stripe/stripe-react-native";
 import axios from "axios";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const OtherUserProfile = ({ route, navigation }) => {
   const { userId } = route.params;
@@ -32,6 +35,7 @@ const OtherUserProfile = ({ route, navigation }) => {
     name: "",
     followers: [],
     following: [],
+    subscribers: [],
   });
   const [isFollowing, setIsFollowing] = useState(false);
   const auth = getAuth();
@@ -39,6 +43,8 @@ const OtherUserProfile = ({ route, navigation }) => {
   const [userPosts, setUserPosts] = useState([]);
   const [userIsChef, setUserIsChef] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [userBlogs, setUserBlogs] = useState([]);
+  const [currentView, setCurrentView] = useState("posts"); // "posts" or "blogs"
 
   // Fetch the role of the user when the component is mounted or when userId changes
   // useEffect(() => {
@@ -61,7 +67,8 @@ const OtherUserProfile = ({ route, navigation }) => {
       // Assuming you have a 'posts' collection with a 'userID' field linking to the user's UID
       const postsRef = query(
         collection(db, "posts"),
-        where("userID", "==", userId)
+        where("userID", "==", userId),
+        orderBy("createdAt", "asc")
       );
 
       const postsSnap = await getDocs(postsRef);
@@ -161,40 +168,44 @@ const OtherUserProfile = ({ route, navigation }) => {
   const subscribeToUser = async () => {
     try {
       if (!currentUser) return;
-      const paymentResponse = await axios.post(
-        `http://192.168.100.115:8080/api/payments/intents`,
-        {
-          amount: 2000,
-        },
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
+      const amount = 151;
+      if (amount > 150) {
+        const paymentResponse = await axios.post(
+          `http://192.168.100.115:8080/payments/intents`,
+          {
+            amount: amount * 100,
+          }
+        );
+
+        console.log(paymentResponse);
+
+        if (paymentResponse.status === 400) {
+          Alert.alert("Something went wrong");
+          return;
         }
-      );
+        const initResponse = await initPaymentSheet({
+          merchantDisplayName: "CookEase",
+          paymentIntentClientSecret: paymentResponse.data.paymentIntent,
+        });
 
-      console.log(paymentResponse);
+        if (initResponse.error) {
+          Alert.alert("Something went wrong");
+          return;
+        }
 
-      if (paymentResponse.status === 400) {
-        Alert.alert("Something went wrong");
-        return;
-      }
-      const initResponse = await initPaymentSheet({
-        merchantDisplayName: "CookEase",
-        paymentIntentClientSecret: paymentResponse.data.paymentIntent,
-      });
-
-      if (initResponse.error) {
-        Alert.alert("Something went wrong");
-        return;
-      }
-
-      const paymentSheetResponse = await presentPaymentSheet();
-      if (paymentSheetResponse.error) {
+        const paymentSheetResponse = await presentPaymentSheet();
+        if (paymentSheetResponse.error) {
+          Alert.alert(
+            `Error code: ${paymentSheetResponse.error.code}`,
+            paymentSheetResponse.error.message
+          );
+          return;
+        }
+      } else {
         Alert.alert(
-          `Error code: ${paymentSheetResponse.error.code}`,
-          paymentSheetResponse.error.message
+          "Price Limit",
+          `Minimum total price for payment through card must be more than Rs. 150, your amount is ${amount}
+          `
         );
         return;
       }
@@ -243,137 +254,268 @@ const OtherUserProfile = ({ route, navigation }) => {
   };
 
   return (
-    <View contentContainerStyle={styles.container}>
-      {/* Back Icon */}
+    <SafeAreaView style={styles.container}>
       <TouchableOpacity
         style={styles.backIcon}
         onPress={() => navigation.goBack()}
       >
         <Icon name="arrow-back" size={30} color="#000" />
       </TouchableOpacity>
-      <Text style={styles.userName}>{userProfile.name}</Text>
-      <Button
-        title={isFollowing ? "Unfollow" : "Follow"}
-        onPress={handleFollow}
-      />
-      <Text style={styles.followers}>
-        Followers: {userProfile.followers.length}
-      </Text>
-      <Text style={styles.followers}>
-        Following: {userProfile.following.length}
-      </Text>
-      {userIsChef && (
-        <View>
-          {!isSubscribed ? (
-            <TouchableOpacity onPress={subscribeToUser} style={styles.button}>
-              <Text>Subscribe</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={unsubscribeFromUser}
-              style={styles.button}
-            >
-              <Text>Unsubscribe</Text>
-            </TouchableOpacity>
-          )}
-          <Button title="Playlist" onPress={handlePlaylistPress} />
-        </View>
-      )}
-      {/* <Text style={styles.followers}>Followers: {userProfile.followers?.length || 0}</Text> */}
-      {/* <FlatList
-        data={userProfile.posts}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <Image source={{ uri: item.imageUrl }} style={styles.image} />
-        )}
-        numColumns={3}
-        ListHeaderComponent={<Text style={styles.postsHeader}>Posts</Text>}
-      /> */}
-      <View style={styles.container}>
-        {userPosts.length > 0 ? (
-          <FlatList
-            data={userPosts}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("postdetail", { post: item })
-                }
-              >
-                {/* <Image source={{ uri: item.image }} style={styles.image} /> */}
-                {item.image &&
-                (item.image.endsWith(".mp4") || item.image.endsWith(".mov")) ? (
-                  <Video
-                    source={{ uri: item.image }}
-                    style={styles.image}
-                    useNativeControls
-                    resizeMode="contain"
-                    // shouldPlay // Auto-play the video
-                    // isLooping // Loop the video
-                    // onError={(e) => console.error("Error loading video", e)}
+      <View style={styles.profileSection}>
+        <Image
+          source={{ uri: userProfile.profilePhoto }}
+          style={styles.profilePic}
+        />
+        <Text style={styles.userName}>{userProfile.name}</Text>
 
-                    // onLoadStart={() => setIsLoading(true)}
-                    // onLoad={() => setIsLoading(false)}
-                  />
-                ) : (
-                  <Image source={{ uri: item.image }} style={styles.image} />
-                )}
+        <View style={styles.countsContainer}>
+          <View style={styles.countItem}>
+            <Text style={styles.countNumber}>
+              {userProfile.followers.length}
+            </Text>
+            <Text style={styles.countLabel}>Followers</Text>
+          </View>
+
+          {userIsChef && (
+            <View style={styles.countItem}>
+              <Text style={styles.countNumber}>
+                {userProfile.subscribers.length ?? 0}
+              </Text>
+              <Text style={styles.countLabel}>Subscribers</Text>
+            </View>
+          )}
+          <View style={styles.countItem}>
+            <Text style={styles.countNumber}>
+              {userProfile.following.length}
+            </Text>
+            <Text style={styles.countLabel}>Following</Text>
+          </View>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleFollow} style={styles.button}>
+            <Text style={styles.buttonText}>
+              {isFollowing ? "Unfollow" : "Follow"}
+            </Text>
+          </TouchableOpacity>
+          {userIsChef && (
+            <>
+              {!isSubscribed ? (
+                <TouchableOpacity
+                  onPress={subscribeToUser}
+                  style={styles.button}
+                >
+                  <Text style={styles.buttonText}>Subscribe</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={unsubscribeFromUser}
+                  style={styles.button}
+                >
+                  <Text style={styles.buttonText}>UnSub</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                onPress={handlePlaylistPress}
+                style={styles.button}
+              >
+                <Text style={styles.buttonText}>Playlist</Text>
               </TouchableOpacity>
-            )}
-            numColumns={3} // Display images in a grid format
-          />
-        ) : (
-          <Text>No posts found</Text>
-        )}
+            </>
+          )}
+        </View>
       </View>
-    </View>
+      <View style={styles.bottomBar}>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => setCurrentView("posts")}
+        >
+          <MaterialCommunityIcons name="grid" size={30} color="#4CAF50" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => setCurrentView("blogs")}
+        >
+          <FontAwesome5 name="readme" size={30} color="#4CAF50" />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.container1}>
+        <View style={styles.container1}>
+          {currentView === "posts" ? (
+            <FlatList
+              key={"posts-3-columns"} // Unique key for posts view
+              data={userPosts}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("postdetail", { post: item })
+                  }
+                  style={styles.postItem}
+                >
+                  {item.image &&
+                  (item.image.endsWith(".mp4") ||
+                    item.image.endsWith(".mov")) ? (
+                    <Video
+                      source={{ uri: item.image }}
+                      style={styles.image}
+                      useNativeControls
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <Image source={{ uri: item.image }} style={styles.image} />
+                  )}
+                </TouchableOpacity>
+              )}
+              numColumns={3}
+              contentContainerStyle={{ paddingHorizontal: 0 }}
+            />
+          ) : (
+            <FlatList
+              key={"blogs-1-column"} // Unique key for blogs view, assuming 1 column for blogs
+              data={userBlogs} // Replace with your state variable for blogs
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                // Adjust according to how you want to render each blog
+                <View style={styles.blogPostContainer}>
+                  <Text style={styles.blogTitle}>{item.title}</Text>
+                  <Text style={styles.blogText}>{item.text}</Text>
+                  {/* Render additional blog details */}
+                </View>
+              )}
+              numColumns={1} // Assuming blogs are rendered in a single column
+            />
+          )}
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
-    padding: 20,
+    flex: 1,
+    backgroundColor: "white",
+    //alignItems: "center",
   },
-  backIcon: {
-    position: "fixed",
-    top: 35, // Adjust top and left as per the design requirements
-    left: 10,
-    zIndex: 10, // Make sure the touchable opacity appears above other elements
+  blogPostContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  blogTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  blogText: {
+    fontSize: 14,
+  },
+  profileSection: {
+    alignItems: "center",
+    paddingTop: 20, // Adjust padding top for safe area
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#dbdbdb",
+  },
+  profilePic: {
+    width: 120,
+    height: 120,
+    borderRadius: 60, // Make it perfectly round
+    marginBottom: 10,
   },
   userName: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 10,
-    marginTop: 40,
+    color: "#262626",
+    marginBottom: 8,
   },
-  followers: {
+  countsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 10, // Space between counters and buttons
+
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 20, // Space below the buttons
+  },
+  countItem: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  countNumber: {
     fontSize: 18,
-    marginVertical: 10,
+    fontWeight: "bold",
+    color: "#262626",
   },
-  postsHeader: {
-    fontSize: 20,
-    alignSelf: "flex-start",
-    marginVertical: 10,
+  countNumber: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#262626",
   },
-  image: {
-    width: 100,
-    height: 100,
-    margin: 2,
+  countLabel: {
+    fontSize: 14,
+    color: "#8e8e8e",
   },
-  image: {
-    width: 100,
-    height: 100,
-    margin: 2,
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 20, // Space below the buttons
   },
   button: {
     backgroundColor: "#4CAF50",
-    width: "80%",
-    padding: 10,
-    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     borderRadius: 10,
-    marginBottom: "7%",
-    marginTop: 17,
+    borderWidth: 1,
+    borderColor: "#4CAF50",
+    flex: 1,
+    marginHorizontal: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  bottomBar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderColor: "#dbdbdb",
+    backgroundColor: "#fafafa",
+    marginTop: "-5%",
+  },
+  iconButton: {
+    alignItems: "center",
+  },
+  image: {
+    width: "33%",
+    aspectRatio: 1,
+    margin: 1,
+  },
+  container1: {
+    paddingHorizontal: 10,
+  },
+  postItem: {
+    flex: 1 / 3,
+    aspectRatio: 1,
+    padding: 2,
+  },
+  image: {
+    flex: 1, // Make the image fill the entire space
+    margin: 1, // Margin to create spacing between images
+    // Remove aspectRatio here if you want the images to fill the space
   },
 });
 

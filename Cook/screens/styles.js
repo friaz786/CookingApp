@@ -30,6 +30,10 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
     marginVertical: 20,
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   flipcamera: {},
   buttonContainer: {
@@ -47,6 +51,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     color: "#fff",
     tintColor: "#fff",
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   boldText: {
     fontWeight: "bold",

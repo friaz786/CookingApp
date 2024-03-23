@@ -11,6 +11,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { db } from "../firebase"; // Adjust the path as necessary
@@ -89,21 +90,8 @@ const HealthForm = ({ navigation }) => {
     <>
       <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-          <View style={styles.container}>
-            <Button
-              title="Enter your Birthday"
-              onPress={() => setShowDatePicker(true)}
-              color="#007AFF"
-            />
-            {showDatePicker && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={birthday}
-                mode="date"
-                display="default"
-                onChange={onDateChange}
-              />
-            )}
+          <SafeAreaView style={styles.container}>
+            <Text style={styles.header}>Your Health Profile</Text>
             <TextInput
               style={styles.input}
               placeholder="Age"
@@ -126,7 +114,9 @@ const HealthForm = ({ navigation }) => {
               onChangeText={setWeight}
             />
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Do you have Diabetes?</Text>
+              <Text style={styles.label}>
+                Do you have Diabetes? {"                          "}
+              </Text>
               <Switch
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
                 thumbColor={hasDiabetes ? "#007AFF" : "#f4f3f4"}
@@ -136,8 +126,12 @@ const HealthForm = ({ navigation }) => {
               />
             </View>
             <View style={styles.switchContainer}>
-              <Text style={styles.label}>Do you have High Blood Pressure?</Text>
+              <Text style={styles.label}>
+                {" "}
+                Do you have High Blood Pressure?{"     "}
+              </Text>
               <Switch
+                style={styles.switch}
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
                 thumbColor={hasBloodPressure ? "#007AFF" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
@@ -146,11 +140,19 @@ const HealthForm = ({ navigation }) => {
               />
             </View>
             <View style={styles.buttonContainer}>
-              <Button
-                title="Calculate BMI"
+              <TouchableOpacity
                 onPress={calculateBMI}
-                color="#007AFF"
-              />
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 10,
+                  borderRadius: 5,
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 16 }}>
+                  Calculate BMI
+                </Text>
+              </TouchableOpacity>
             </View>
             {bmi && (
               <Text style={styles.bmiText}>
@@ -158,9 +160,21 @@ const HealthForm = ({ navigation }) => {
               </Text>
             )}
             <View style={styles.buttonContainer}>
-              <Button title="Save" onPress={saveData} color="#007AFF" />
+              <TouchableOpacity
+                onPress={saveData}
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  borderRadius: 5,
+                  fontWeight: "bold",
+                }}
+              >
+                <Text style={{ color: "white", fontSize: 16 }}>Save</Text>
+              </TouchableOpacity>
             </View>
-          </View>
+          </SafeAreaView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </>
@@ -171,8 +185,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 20,
-    backgroundColor: "#ffe6e6", // A light grey background color for contrast
+    backgroundColor: "white", // A light grey background color for contrast
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: "center",
   },
   label: {
     fontSize: 16,
@@ -188,14 +210,17 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderWidth: 1,
     padding: 10,
-    marginBottom: 15,
+    marginBottom: "1%",
+    marginTop: "2%",
     borderRadius: 10,
     backgroundColor: "white",
     shadowColor: "black",
     shadowOffset: { width: 1, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    //marginLeft: "5%",
   },
+  switch: {},
   switchContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -205,14 +230,19 @@ const styles = StyleSheet.create({
   buttonContainer: {
     backgroundColor: "#4CAF50",
     width: "80%",
-    padding: 10,
     alignItems: "center",
     borderRadius: 10,
-    marginBottom: "7%",
+    padding: 1,
+    marginBottom: "5%",
     marginTop: 17,
+    shadowColor: "black",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    //marginLeft: "9%",
   },
   bmiText: {
-    marginTop: 20,
+    marginTop: "2%",
     fontSize: 18,
     fontWeight: "bold",
     color: "#007AFF", // Use the system blue color for highlighting the BMI result

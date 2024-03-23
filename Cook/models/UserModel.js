@@ -5,7 +5,9 @@ class UserModel {
     role,
     cuisine,
     followers = [],
-    following = []
+    following = [],
+    subscribers = [],
+    subscribedTo = []
   ) {
     // Add followers parameter with a default empty array
     this.name = name;
@@ -14,6 +16,8 @@ class UserModel {
     this.followers = followers;
     this.following = following;
     this.cuisines = cuisines;
+    this.subscribers = subscribers;
+    this.subscribedTo = subscribedTo;
   }
 
   toFirestore() {
@@ -24,6 +28,8 @@ class UserModel {
       cuisines: this.cuisines,
       followers: this.followers,
       following: this.following,
+      subscribers: this.subscribers,
+      subscribedTo: this.subscribedTo,
     };
   }
 }

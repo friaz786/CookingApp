@@ -10,6 +10,7 @@ import {
 import { getAuth } from "firebase/auth";
 import { db } from "../firebase"; // Adjust the path as necessary
 import { doc, setDoc, collection } from "firebase/firestore";
+import { Ionicons } from "@expo/vector-icons";
 
 const AddRecipeForEvent = ({ route, navigation }) => {
   const { recipe, eventName, date } = route.params;
@@ -55,17 +56,19 @@ const AddRecipeForEvent = ({ route, navigation }) => {
     <ScrollView style={styles.container}>
       <View style={styles.customHeader}>
         <TouchableOpacity
+          style={styles.backIcon}
           onPress={() => navigation.goBack()}
-          style={styles.headerButton}
         >
-          <Text style={styles.headerButtonText}>Back</Text>
+          <Ionicons name="chevron-back" size={30} color="#000" />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={addRecipeToEvent}
-          style={styles.headerButton}
-        >
-          <Text style={styles.headerButtonText}>Add</Text>
-        </TouchableOpacity>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <TouchableOpacity
+            onPress={addRecipeToEvent}
+            style={styles.headerButton}
+          >
+            <Text style={styles.headerButtonText}>Add</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Recipe Name</Text>
@@ -89,16 +92,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  backIcon: {
+    // Removed absolute positioning to allow natural flow within the flex container
+    zIndex: 10,
+    marginTop: "5%",
+  },
   customHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center", // Ensure items are vertically centered
     padding: 20,
   },
   headerButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: "#007AFF", // Or any color that fits your theme
+    backgroundColor: "#4CAF50",
+    marginTop: "5%",
   },
   headerButtonText: {
     color: "white",
@@ -109,7 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     marginHorizontal: 20,
-    marginTop: 20,
+    marginTop: "4%",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -131,5 +140,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
 export default AddRecipeForEvent;

@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { db } from '../firebase'; // Adjust this import according to your file structure
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { Video } from 'expo-av';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { db } from "../firebase"; // Adjust this import according to your file structure
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { Video } from "expo-av";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const OtherPlaylist = ({ route, navigation }) => {
   const { userId } = route.params; // Ensure this userId is the same as in your Firestore documents
@@ -12,7 +18,10 @@ const OtherPlaylist = ({ route, navigation }) => {
   useEffect(() => {
     const fetchVideos = async () => {
       console.log("Attempting to fetch videos for userId:", userId); // Debugging log
-      const q = query(collection(db, 'playlist'), where('userID', '==', userId));
+      const q = query(
+        collection(db, "playlist"),
+        where("userID", "==", userId)
+      );
       try {
         const querySnapshot = await getDocs(q);
         const fetchedVideos = querySnapshot.docs.map((doc) => ({
@@ -33,7 +42,9 @@ const OtherPlaylist = ({ route, navigation }) => {
     <View style={styles.videoContainer}>
       <TouchableOpacity
         style={styles.videoContainer}
-        onPress={() => navigation.navigate('playlistdetail', { videoData: item })}
+        onPress={() =>
+          navigation.navigate("playlistdetail", { videoData: item })
+        }
       >
         <Video
           source={{ uri: item.image }}
@@ -49,7 +60,10 @@ const OtherPlaylist = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       {/* Back Icon */}
-      <TouchableOpacity style={styles.backIcon} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={() => navigation.goBack()}
+      >
         <Icon name="arrow-back" size={30} color="#000" />
       </TouchableOpacity>
       <View style={styles.videoContainer}>
@@ -71,14 +85,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-
   },
   videoContainer: {
     marginBottom: 20,
-    marginTop: '5%',
+    marginTop: "5%",
   },
   video: {
-    width: '100%',
+    width: "100%",
     height: 200,
     //marginTop: '10%',
   },
@@ -87,7 +100,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   backIcon: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginLeft: 10,
     marginTop: "11%",
   },

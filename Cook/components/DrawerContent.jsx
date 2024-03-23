@@ -1,55 +1,84 @@
-import { View, StyleSheet, Text } from "react-native";
-import { Title, Drawer, Avatar } from "react-native-paper";
-import {
-  DrawerContentScrollView,
-  DrawerItem,
-  DrawerItemList,
-} from "@react-navigation/drawer";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import { Title, Drawer, Avatar } from 'react-native-paper';
+import { MaterialIcons } from '@expo/vector-icons';
+import { getAuth, signOut } from 'firebase/auth';
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
 
 export default function DrawerContent(props) {
+    const [userProfile, setUserProfile] = useState({ name: 'Loading...', photoURL: '', initials: '' });
+
+    const auth = getAuth();
+    const db = getFirestore();
+    const user = auth.currentUser;
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            if (user) {
+                const userDocRef = doc(db, 'users', user.uid);
+                const userSnapshot = await getDoc(userDocRef);
+                if (userSnapshot.exists()) {
+                    const userData = userSnapshot.data();
+                    const initials = userData.name ? userData.name.match(/\b\w/g).join('') : '';
+                    setUserProfile({
+                        ...userProfile,
+                        name: userData.name,
+                        photoURL: userData.profilePhoto, // Changed to use the correct field
+                        initials: initials,
+                    });
+                } else {
+                    console.log('No such document!');
+                }
+            }
+        };
+
+        fetchUserProfile();
+    }, [user]);
+
+    const handleLogout = () => {
+        signOut(auth).then(() => {
+            // Sign-out successful.
+            props.navigation.navigate('login');
+        }).catch((error) => {
+            // An error happened.
+            console.error("Logout error: ", error);
+        });
+    };
+
     return (
-    <>
-      <View style={{ flex: 1 }}>
-        <DrawerContentScrollView {...props}>
-          <View style={styles.drawerContent}>
-            <View style={styles.userInfoSection}>
-              <View style={{ flexDirection: "row", marginTop: 15 }}>
-                <View style={styles.avatarContainer}>
-                  <Avatar.Image
-                    size={50}
-                    style={{ backgroundColor: "#00BE00" }}
-                  />
-                  <Text style={styles.initialsText}>AR</Text>
+        <View style={{ flex: 1 }}>
+            <DrawerContentScrollView {...props}>
+                <View style={styles.drawerContent}>
+                    <View style={styles.userInfoSection}>
+                        <View style={{ flexDirection: 'row', marginTop: 15 }}>
+                            <Avatar.Image
+                                size={50}
+                                source={{ uri: userProfile.photoURL || undefined }}
+                                style={{ backgroundColor: userProfile.photoURL ? 'transparent' : '#00BE00' }}
+                            />
+                            { !userProfile.photoURL && <Text style={styles.initialsText}>{userProfile.initials}</Text> }
+                            <View style={{ marginLeft: 15, flexDirection: 'column', marginTop: 6 }}>
+                                <Title style={styles.title}>{userProfile.name}</Title>
+                            </View>
+                        </View>
+                    </View>
+                    <Drawer.Section style={styles.drawerSection}>
+                    <DrawerItemList {...props} />
+
+                    </Drawer.Section>
                 </View>
-                <View
-                  style={{
-                    marginLeft: 15,
-                    flexDirection: "column",
-                    marginTop: 6,
-                  }}
-                >
-                  <Title style={styles.title}>Aisha Raja</Title>
-                </View>
-              </View>
-            </View>
-            <Drawer.Section style={styles.drawerSection} showDivider={false}>
-              <DrawerItemList {...props} />
+                </DrawerContentScrollView>
+            <Drawer.Section>
+                <DrawerItem
+                    icon={() => <MaterialIcons name="logout" size={24} color="red" />}
+                    label="Logout"
+                    labelStyle={{ color: "red", fontWeight: "600", fontSize: 16 }}
+                    onPress={handleLogout}
+                />
             </Drawer.Section>
-          </View>
-        </DrawerContentScrollView>
-        <Drawer.Section showDivider={false}>
-        <DrawerItem
-              icon={() => <MaterialIcons name="logout" size={24} color="red" />}
-              label="Logout"
-              labelStyle={{ color: "red", fontWeight: "600", fontSize: 16 }}
-              style={styles.bottomDrawerSection}
-            />
-        </Drawer.Section>
-      </View>
-    </>
-  );
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -113,4 +142,31 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
+  drawerContent: {
+    flex: 1,
+},
+userInfoSection: {
+    paddingLeft: 20,
+},
+initialsText: {
+    position: "absolute",
+    left: 17,
+    top: 10,
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 20,
+},
+title: {
+    fontSize: 18,
+    marginTop: 3,
+    fontWeight: "bold",
+},
+drawerSection: {
+    marginTop: 15,
+},
+bottomDrawerSection: {
+    marginBottom: 15,
+    borderTopColor: '#f4f4f4',
+    borderTopWidth: 1,
+},
 });

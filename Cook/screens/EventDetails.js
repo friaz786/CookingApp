@@ -10,6 +10,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { getAuth } from "firebase/auth";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../firebase";
+import EventRecipe from "./EventRecipe";
+import { Ionicons } from "@expo/vector-icons";
 
 const EventDetails = ({ route, navigation }) => {
   const { eventName, date } = route.params;
@@ -22,7 +24,7 @@ const EventDetails = ({ route, navigation }) => {
     const q = query(
       collection(db, "users", auth.currentUser.uid, "eventRecipes"),
       where("eventName", "==", eventName),
-      where("date", "==", date) // Make sure to filter by date if it's necessary
+      where("date", "==", date)
     );
 
     const unsubscribe = onSnapshot(
@@ -36,7 +38,7 @@ const EventDetails = ({ route, navigation }) => {
       },
       (error) => {
         console.error("Error fetching event meals", error);
-        Alert.alert("Error fetching event meals", error.message);
+        // Alert.alert("Error fetching event meals", error.message);
       }
     );
 
@@ -49,10 +51,11 @@ const EventDetails = ({ route, navigation }) => {
         style={styles.backIcon}
         onPress={() => navigation.goBack()}
       >
-        <Icon name="arrow-back" size={30} color="#000" />
+        <Ionicons name="chevron-back" size={30} color="#000" />
       </TouchableOpacity>
 
-      <Text style={styles.screenTitle}>{eventName} - Meal Details</Text>
+      <Text style={styles.screenTitle}>Event Plan for {eventName}</Text>
+
       <Text style={styles.dateText}>
         Date:{" "}
         {new Date(date).toLocaleDateString("en-GB", {
@@ -63,24 +66,13 @@ const EventDetails = ({ route, navigation }) => {
       </Text>
 
       {eventMeals.map((meal, index) => (
-        <View key={index} style={styles.mealPlanContainer}>
-          <Text style={styles.mealType}>Recipe Name: {meal.mealType}</Text>
-          <Text style={styles.recipeTitle}>Recipe: {meal.recipe}</Text>
-
-          <Text style={styles.ingredientsTitle}>Ingredients:</Text>
-          {meal.ingredients.map((ingredient, idx) => (
-            <Text key={idx} style={styles.ingredientText}>
-              - {ingredient}
-            </Text>
-          ))}
-
-          <Text style={styles.stepsTitle}>Steps:</Text>
-          {meal.steps.map((step, idx) => (
-            <Text key={idx} style={styles.stepText}>
-              {idx + 1}. {step}
-            </Text>
-          ))}
-        </View>
+        <TouchableOpacity
+          key={index}
+          onPress={() => navigation.navigate("EventRecipe", { recipe: meal })}
+          style={styles.card}
+        >
+          <Text style={styles.cardText}>{meal.recipe}</Text>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );
@@ -92,7 +84,9 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   backIcon: {
-    marginBottom: 20,
+    // Removed absolute positioning to allow natural flow within the flex container
+    zIndex: 10,
+    marginTop: "5%",
   },
   screenTitle: {
     fontSize: 22,
@@ -106,36 +100,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
-  mealPlanContainer: {
-    marginBottom: 30,
+  card: {
+    backgroundColor: "lightgrey", // Light grey background for the card
+    borderRadius: 8, // Rounded corners for the card
+    padding: 10, // Padding inside the card
+    marginBottom: 10, // Space between cards
+    shadowColor: "black", // Shadow color
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  mealType: {
+  cardText: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  recipeTitle: {
-    fontSize: 18,
-    fontStyle: "italic",
-    marginTop: 5,
-  },
-  ingredientsTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  ingredientText: {
-    fontSize: 16,
-    marginLeft: 15,
-  },
-  stepsTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-  },
-  stepText: {
-    fontSize: 16,
-    marginLeft: 15,
+    color: "#000",
   },
 });
 
